@@ -1,0 +1,168 @@
+{
+  "classic_christmas": [
+    {
+      "name": "Pre-Lit Premium Christmas Tree",
+      "price": "$249-$499",
+      "image": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=pre-lit+christmas+tree&tag=homedesignai-20"
+    },
+    {
+      "name": "Red & Gold Ornament Set",
+      "price": "$19.99",
+      "image": "https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=red+gold+christmas+ornaments&tag=homedesignai-20"
+    },
+    {
+      "name": "Traditional Christmas Garland",
+      "price": "$32.99",
+      "image": "https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=christmas+garland&tag=homedesignai-20"
+    },
+    {
+      "name": "Warm White String Lights",
+      "price": "$16.99",
+      "image": "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=warm+white+christmas+lights&tag=homedesignai-20"
+    },
+    {
+      "name": "Red Poinsettia Plant",
+      "price": "$24.99",
+      "image": "https://images.unsplash.com/photo-1544864717-2bf2d7e3c9f6?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=christmas+poinsettia&tag=homedesignai-20"
+    },
+    {
+      "name": "Classic Red Stockings Set",
+      "price": "$28.99",
+      "image": "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=red+christmas+stockings&tag=homedesignai-20"
+    }
+  ],
+  "nordic_minimalist": [
+    {
+      "name": "Natural Pine Wreath",
+      "price": "$44.99",
+      "image": "https://images.unsplash.com/photo-1544985361-b420d7a77043?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=natural+pine+wreath&tag=homedesignai-20"
+    },
+    {
+      "name": "Simple White String Lights",
+      "price": "$14.99",
+      "image": "https://images.unsplash.com/photo-1482442120256-9c03866de390?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=white+string+lights&tag=homedesignai-20"
+    },
+    {
+      "name": "Wooden Ornament Set",
+      "price": "$26.99",
+      "image": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=wooden+christmas+ornaments&tag=homedesignai-20"
+    },
+    {
+      "name": "White Ceramic Vase Set",
+      "price": "$35.99",
+      "image": "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=white+ceramic+vase&tag=homedesignai-20"
+    },
+    {
+      "name": "Natural Wool Throw Blanket",
+      "price": "$54.99",
+      "image": "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=wool+throw+blanket&tag=homedesignai-20"
+    }
+  ],
+  "modern_silver": [
+    {
+      "name": "Silver Ornament Collection",
+      "price": "$34.99",
+      "image": "https://images.unsplash.com/photo-1607006663453-9c6d8e86a0d9?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=silver+christmas+ornaments&tag=homedesignai-20"
+    },
+    {
+      "name": "Cool LED String Lights",
+      "price": "$21.99",
+      "image": "https://images.unsplash.com/photo-1544546966-ec1d24e5be37?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=cool+white+led+lights&tag=homedesignai-20"
+    },
+    {
+      "name": "Geometric Metal Decorations",
+      "price": "$42.99",
+      "image": "https://images.unsplash.com/photo-1482517967863-00e15c9b44be?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=geometric+christmas+decorations&tag=homedesignai-20"
+    },
+    {
+      "name": "Silver Tree Topper",
+      "price": "$29.99",
+      "image": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=silver+tree+topper&tag=homedesignai-20"
+    },
+    {
+      "name": "White & Silver Garland",
+      "price": "$32.99",
+      "image": "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=silver+white+garland&tag=homedesignai-20"
+    }
+  ],
+  "cozy_family": [
+    {
+      "name": "Colorful Ornament Mix",
+      "price": "$24.99",
+      "image": "https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=colorful+christmas+ornaments&tag=homedesignai-20"
+    },
+    {
+      "name": "Warm Amber String Lights",
+      "price": "$19.99",
+      "image": "https://images.unsplash.com/photo-1544546966-ec1d24e5be37?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=warm+amber+string+lights&tag=homedesignai-20"
+    },
+    {
+      "name": "Rustic Wooden Decorations",
+      "price": "$36.99",
+      "image": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=rustic+christmas+decorations&tag=homedesignai-20"
+    },
+    {
+      "name": "Plush Holiday Throw Pillows",
+      "price": "$29.99",
+      "image": "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=christmas+throw+pillows&tag=homedesignai-20"
+    },
+    {
+      "name": "Vintage-Style Ornament Set",
+      "price": "$38.99",
+      "image": "https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=vintage+christmas+ornaments&tag=homedesignai-20"
+    },
+    {
+      "name": "Cozy Red Throw Blanket",
+      "price": "$44.99",
+      "image": "https://images.unsplash.com/photo-1534452203293-494d7ddbf7e0?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=red+throw+blanket&tag=homedesignai-20"
+    }
+  ],
+  "custom": [
+    {
+      "name": "Mixed Ornament Collection",
+      "price": "$29.99",
+      "image": "https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=christmas+ornaments&tag=homedesignai-20"
+    },
+    {
+      "name": "LED String Lights",
+      "price": "$17.99",
+      "image": "https://images.unsplash.com/photo-1513885535751-8b9238bd345a?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=christmas+string+lights&tag=homedesignai-20"
+    },
+    {
+      "name": "Christmas Garland",
+      "price": "$31.99",
+      "image": "https://images.unsplash.com/photo-1576919228236-a097c32a5cd4?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=christmas+garland&tag=homedesignai-20"
+    },
+    {
+      "name": "Holiday Decor Bundle",
+      "price": "$52.99",
+      "image": "https://images.unsplash.com/photo-1512389142860-9c449e58a543?w=500&h=500&fit=crop",
+      "link": "https://www.amazon.com/s?k=christmas+decorations&tag=homedesignai-20"
+    }
+  ]
+}

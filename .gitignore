@@ -1,0 +1,62 @@
+# Node.js Backend
+Backend/node_modules/
+Backend/.env
+Backend/npm-debug.log*
+Backend/yarn-debug.log*
+Backend/yarn-error.log*
+
+# Xcode
+iOS/*.xcodeproj/
+iOS/*.xcworkspace/
+iOS/build/
+iOS/DerivedData/
+iOS/*.moved-aside
+iOS/*.pbxuser
+iOS/*.mode1v3
+iOS/*.mode2v3
+iOS/*.perspectivev3
+iOS/*.hmap
+iOS/*.ipa
+iOS/*.dSYM.zip
+iOS/*.dSYM
+
+# iOS
+iOS/Pods/
+iOS/Podfile.lock
+iOS/.DS_Store
+
+# Swift Package Manager
+iOS/.swiftpm/
+iOS/.build/
+
+# CocoaPods
+iOS/Pods/
+
+# Fastlane
+iOS/fastlane/report.xml
+iOS/fastlane/Preview.html
+iOS/fastlane/screenshots
+iOS/fastlane/test_output
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
