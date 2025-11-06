@@ -158,27 +158,28 @@ struct ResultView: View {
             .padding(.horizontal, AppSpacing.xl)
             .padding(.bottom, AppSpacing.lg)
 
-            // About button in top-left corner
-            VStack {
-                HStack {
-                    Button(action: { showAbout = true }) {
-                        Image(systemName: "info.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(.white.opacity(0.9))
-                            .background(
-                                Circle()
-                                    .fill(Color.black.opacity(0.2))
-                                    .frame(width: 34, height: 34)
-                            )
-                    }
-                    .accessibilityLabel("About")
-                    .accessibilityHint("View app information, privacy policy, and terms of service")
-                    .padding(.top, 50)
-                    .padding(.leading, 20)
-                    Spacer()
-                }
-                Spacer()
-            }
+            // About button in top-left corner - temporarily disabled
+            // TODO: Uncomment when AboutView is added to Xcode project
+            // VStack {
+            //     HStack {
+            //         Button(action: { showAbout = true }) {
+            //             Image(systemName: "info.circle.fill")
+            //                 .font(.system(size: 28))
+            //                 .foregroundColor(.white.opacity(0.9))
+            //                 .background(
+            //                     Circle()
+            //                         .fill(Color.black.opacity(0.2))
+            //                         .frame(width: 34, height: 34)
+            //                 )
+            //         }
+            //         .accessibilityLabel("About")
+            //         .accessibilityHint("View app information, privacy policy, and terms of service")
+            //         .padding(.top, 50)
+            //         .padding(.leading, 20)
+            //         Spacer()
+            //     }
+            //     Spacer()
+            // }
 
             if !reduceMotion && !celebrationParticles.isEmpty {
                 ForEach(celebrationParticles) { particle in
@@ -205,9 +206,10 @@ struct ResultView: View {
                 )
             }
         }
-        .sheet(isPresented: $showAbout) {
-            AboutView()
-        }
+        // TODO: Uncomment when AboutView is added to Xcode project
+        // .sheet(isPresented: $showAbout) {
+        //     AboutView()
+        // }
         .overlay(
             Group {
                 if showEmailSheet && !viewModel.hasSubmittedEmail {
