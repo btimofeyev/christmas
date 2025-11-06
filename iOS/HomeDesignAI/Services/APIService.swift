@@ -35,12 +35,11 @@ class APIService {
     static let shared = APIService()
 
     // MARK: - Configuration
-    // TODO: Update this URL when backend is deployed
     private var baseURL: String {
         #if DEBUG
         return "http://localhost:3000"
         #else
-        return "https://your-backend-url.com" // Update with production URL
+        return "https://christmas-production-18fe.up.railway.app"
         #endif
     }
 

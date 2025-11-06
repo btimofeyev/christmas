@@ -76,7 +76,7 @@ struct AboutView: View {
                             .foregroundColor(.white)
 
                         VStack(spacing: 12) {
-                            if let privacyURL = URL(string: "https://your-railway-app.railway.app/privacy") {
+                            if let privacyURL = URL(string: "https://christmas-production-18fe.up.railway.app/privacy") {
                                 Link(destination: privacyURL) {
                                     LegalLinkCard(
                                         icon: "lock.shield.fill",
@@ -86,7 +86,7 @@ struct AboutView: View {
                                 }
                             }
 
-                            if let termsURL = URL(string: "https://your-railway-app.railway.app/terms") {
+                            if let termsURL = URL(string: "https://christmas-production-18fe.up.railway.app/terms") {
                                 Link(destination: termsURL) {
                                     LegalLinkCard(
                                         icon: "doc.text.fill",
