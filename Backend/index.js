@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import generateRouter from './routes/generate.js';
 import subscribeRouter from './routes/subscribe.js';
+import referralRouter from './routes/referral.js';
 
 // Load environment variables
 dotenv.config();
@@ -59,6 +60,13 @@ app.get('/health', (req, res) => {
 // API Routes (MUST come before static files!)
 app.use('/generate', generateRouter);
 app.use('/subscribe', subscribeRouter);
+app.use('/referral', referralRouter);
+
+// Referral landing page route
+app.get('/r/:code', (req, res) => {
+  const code = req.params.code;
+  res.sendFile(path.join(__dirname, '../public/r.html'));
+});
 
 // Serve static files from public directory (fallback - comes AFTER API routes)
 const publicPath = path.join(__dirname, '../public');

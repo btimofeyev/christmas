@@ -42,20 +42,20 @@ class HomeDesignViewModel: ObservableObject {
     @Published var showError = false
     @Published var errorMessage: String = ""
 
-    // Email Subscription
-    @Published var showEmailCapture = false
-    @Published var isSubscribing = false
-    @Published var subscriptionSuccess = false
-    @Published var subscriptionMessage: String = ""
+    // Referral System
+    @Published var showReferralPrompt = false
+    @Published var myReferralCode: String?
+    @Published var myReferralUrl: String?
+    @Published var isGeneratingReferralCode = false
+    @Published var referralRewardMessage: String = ""
+    @Published var showReferralReward = false
 
-    // Generation Limits & Email Gate
-    @Published var generationsRemaining: Int = 5  // Start with 5 free generations
+    // Generation Limits
+    @Published var generationsRemaining: Int = AppConfig.initialFreeGenerations
     private let generationsKey = "user_generations_remaining"
-    private let freeGenerations = 5  // Free tier
-    private let emailUnlockGenerations = 10  // Bonus after email
-    private let maxGenerations = 15  // Total cap (5 free + 10 email bonus)
-    @Published var hasSubmittedEmail = false
-    private let hasSubmittedEmailKey = "user_has_submitted_email"
+    private let myReferralCodeKey = "my_referral_code"
+    private let myReferralUrlKey = "my_referral_url"
+    private let claimedReferralCodesKey = "claimed_referral_codes"
 
     // Video Export
     @Published var isCreatingVideo = false
@@ -120,14 +120,15 @@ class HomeDesignViewModel: ObservableObject {
     init() {
         analytics.track(event: .appLaunched)
 
-        // Load email submission status
-        hasSubmittedEmail = UserDefaults.standard.bool(forKey: hasSubmittedEmailKey)
+        // Load referral code if exists
+        myReferralCode = UserDefaults.standard.string(forKey: myReferralCodeKey)
+        myReferralUrl = UserDefaults.standard.string(forKey: myReferralUrlKey)
 
         // Load generation count from storage
         let storedGenerations = UserDefaults.standard.integer(forKey: generationsKey)
         if storedGenerations == 0 {
-            // First time user - give 5 free generations
-            generationsRemaining = freeGenerations
+            // First time user - give initial free generations
+            generationsRemaining = AppConfig.initialFreeGenerations
             saveGenerationCount()
         } else {
             generationsRemaining = storedGenerations
@@ -230,13 +231,8 @@ class HomeDesignViewModel: ObservableObject {
 
         // Check if user has generations remaining
         if generationsRemaining <= 0 {
-            // Show email capture if they haven't submitted yet
-            if !hasSubmittedEmail {
-                showEmailCapture = true
-            } else {
-                // Hard stop - they've used all 15 generations
-                showErrorMessage("You've used all your free designs! Thank you for using HomeDesign AI 🎄")
-            }
+            // Show referral prompt to earn more generations
+            showReferralPrompt = true
             return
         }
 
@@ -446,50 +442,110 @@ class HomeDesignViewModel: ObservableObject {
         */
     }
 
-    // MARK: - Email Subscription
+    // MARK: - Referral System
 
-    func subscribeToMainApp(email: String) {
-        // Grant 10 more generations immediately
-        generationsRemaining += emailUnlockGenerations
-        saveGenerationCount()
+    /// Get device identifier for referral tracking
+    private var deviceId: String {
+        UIDevice.current.identifierForVendor?.uuidString ?? "unknown"
+    }
 
-        // Mark as submitted
-        hasSubmittedEmail = true
-        UserDefaults.standard.set(true, forKey: hasSubmittedEmailKey)
-
-        // Show success
-        subscriptionMessage = "Success! You unlocked 10 more designs 🎁"
-        subscriptionSuccess = true
-
-        // Track subscription
-        analytics.track(event: .emailSubscribed)
-
-        // Haptic feedback
-        HapticFeedback.success()
-
-        // Auto-dismiss after 2 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.showEmailCapture = false
+    /// Generate or retrieve user's referral code
+    func generateOrGetReferralCode() {
+        // Return existing code if available
+        if let existingCode = myReferralCode, let existingUrl = myReferralUrl {
+            return
         }
 
-        // TODO: Uncomment when EmailService.swift is added to Xcode
-        /*
         Task {
-            isSubscribing = true
+            isGeneratingReferralCode = true
 
             do {
-                let (message, alreadySubscribed) = try await emailService.subscribe(email: email)
-                // Email sent to backend for storage
+                let response = try await apiService.generateReferralCode(deviceId: deviceId)
+
+                // Store referral code
+                self.myReferralCode = response.code
+                self.myReferralUrl = response.shareUrl
+                UserDefaults.standard.set(response.code, forKey: myReferralCodeKey)
+                UserDefaults.standard.set(response.shareUrl, forKey: myReferralUrlKey)
+
+                // Track event
+                analytics.track(event: .referralCodeGenerated)
+
             } catch {
-                // Fail silently - user already got their generations
                 #if DEBUG
-                print("Email backend error: \(error)")
+                print("Failed to generate referral code: \(error)")
                 #endif
+                // Fail silently - user can try again
             }
 
-            isSubscribing = false
+            isGeneratingReferralCode = false
         }
-        */
+    }
+
+    /// Claim a referral code (called when user opens app via referral link)
+    func claimReferral(code: String) {
+        // Check if already claimed this code
+        let claimedCodes = UserDefaults.standard.stringArray(forKey: claimedReferralCodesKey) ?? []
+        if claimedCodes.contains(code) {
+            // Already claimed, ignore
+            return
+        }
+
+        Task {
+            do {
+                let response = try await apiService.claimReferral(code: code, deviceId: deviceId)
+
+                // Award generations to current user
+                self.generationsRemaining += response.reward.claimer
+                saveGenerationCount()
+
+                // Mark code as claimed
+                var updatedClaimedCodes = claimedCodes
+                updatedClaimedCodes.append(code)
+                UserDefaults.standard.set(updatedClaimedCodes, forKey: claimedReferralCodesKey)
+
+                // Show success message
+                self.referralRewardMessage = "Welcome! You earned \(response.reward.claimer) free designs! 🎁"
+                self.showReferralReward = true
+
+                // Track event
+                analytics.track(event: .referralClaimed(code: code))
+
+                // Haptic feedback
+                HapticFeedback.success()
+
+                // Auto-dismiss after 3 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    self.showReferralReward = false
+                }
+
+            } catch {
+                #if DEBUG
+                print("Failed to claim referral: \(error)")
+                #endif
+                // Fail silently - might be invalid/expired code
+            }
+        }
+    }
+
+    /// Share referral link to invite friends
+    func shareReferralLink() -> some View {
+        // Generate code if doesn't exist
+        if myReferralCode == nil {
+            generateOrGetReferralCode()
+        }
+
+        guard let referralUrl = myReferralUrl else {
+            return AnyView(EmptyView())
+        }
+
+        let shareText = "Transform your space for the holidays with AI! 🎄✨\nGet HolidayHome AI free and we both earn +\(AppConfig.referralRewardAmount) designs:\n\(referralUrl)"
+
+        analytics.track(event: .sharedToUnlock)
+
+        return AnyView(
+            ShareSheet(items: [shareText])
+        )
     }
 
     // MARK: - Error Handling

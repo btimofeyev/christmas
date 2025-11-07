@@ -22,8 +22,9 @@ enum AnalyticsEvent {
     case productClicked(productName: String, style: String, price: String, position: Int)
     case imageSaved
     case imageShared
-    case emailSubscribed
+    case referralCodeGenerated
     case sharedToUnlock
+    case referralClaimed(code: String)
     case videoCreated
     case videoShared
     case errorOccurred(error: String)
@@ -41,8 +42,9 @@ enum AnalyticsEvent {
         case .productClicked: return "product_clicked"
         case .imageSaved: return "image_saved"
         case .imageShared: return "image_shared"
-        case .emailSubscribed: return "email_subscribed"
+        case .referralCodeGenerated: return "referral_code_generated"
         case .sharedToUnlock: return "shared_to_unlock"
+        case .referralClaimed: return "referral_claimed"
         case .videoCreated: return "video_created"
         case .videoShared: return "video_shared"
         case .errorOccurred: return "error_occurred"
@@ -66,6 +68,8 @@ enum AnalyticsEvent {
             ]
         case .errorOccurred(let error):
             return ["error_message": error]
+        case .referralClaimed(let code):
+            return ["referral_code": code]
         default:
             return [:]
         }

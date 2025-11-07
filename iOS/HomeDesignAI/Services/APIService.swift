@@ -141,6 +141,108 @@ class APIService {
 
         return httpResponse.statusCode == 200
     }
+
+    // MARK: - Referral System
+
+    /// Generates a unique referral code for the current user
+    /// - Parameter deviceId: Unique device identifier
+    /// - Returns: ReferralCodeResponse containing the code and shareable URL
+    func generateReferralCode(deviceId: String) async throws -> ReferralCodeResponse {
+        guard let url = URL(string: "\(baseURL)/referral/generate-referral") else {
+            throw APIError.invalidURL
+        }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.timeoutInterval = 30
+
+        let requestBody = ["deviceId": deviceId]
+
+        do {
+            urlRequest.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+
+        // Perform request
+        do {
+            let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw APIError.invalidResponse
+            }
+
+            if httpResponse.statusCode != 200 {
+                if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                    throw APIError.serverError(errorResponse.error)
+                }
+                throw APIError.serverError("HTTP \(httpResponse.statusCode)")
+            }
+
+            let decoder = JSONDecoder()
+            let referralResponse = try decoder.decode(ReferralCodeResponse.self, from: data)
+            return referralResponse
+
+        } catch let error as APIError {
+            throw error
+        } catch {
+            throw APIError.networkError(error)
+        }
+    }
+
+    /// Claims a referral code (called when new user installs via referral link)
+    /// - Parameters:
+    ///   - code: The referral code to claim
+    ///   - deviceId: Unique device identifier of the claimer
+    /// - Returns: ReferralClaimResponse with reward information
+    func claimReferral(code: String, deviceId: String) async throws -> ReferralClaimResponse {
+        guard let url = URL(string: "\(baseURL)/referral/claim-referral") else {
+            throw APIError.invalidURL
+        }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.timeoutInterval = 30
+
+        let requestBody = [
+            "code": code,
+            "claimerDeviceId": deviceId
+        ]
+
+        do {
+            urlRequest.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+
+        // Perform request
+        do {
+            let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw APIError.invalidResponse
+            }
+
+            // Handle error responses (400, 404, etc.)
+            if httpResponse.statusCode != 200 {
+                if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                    throw APIError.serverError(errorResponse.error)
+                }
+                throw APIError.serverError("HTTP \(httpResponse.statusCode)")
+            }
+
+            let decoder = JSONDecoder()
+            let claimResponse = try decoder.decode(ReferralClaimResponse.self, from: data)
+            return claimResponse
+
+        } catch let error as APIError {
+            throw error
+        } catch {
+            throw APIError.networkError(error)
+        }
+    }
 }
 
 // MARK: - Helper Models

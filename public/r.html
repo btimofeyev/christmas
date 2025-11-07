@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join HolidayHome AI - Transform Your Space!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #D2122E 0%, #8F010E 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        p {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #EBC23D;
+            color: #11571F;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 16px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .referral-code {
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin: 24px 0;
+            letter-spacing: 4px;
+        }
+
+        .benefits {
+            margin-top: 32px;
+            text-align: left;
+        }
+
+        .benefit {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        .benefit-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .loading {
+            font-size: 16px;
+            opacity: 0.7;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🎄✨</div>
+        <h1>You're Invited!</h1>
+        <p>Transform your space for the holidays with AI-powered decoration designs.</p>
+
+        <div class="referral-code" id="referral-code">
+            <!-- Will be filled by JavaScript -->
+        </div>
+
+        <div class="benefits">
+            <div class="benefit">
+                <span class="benefit-icon">🎁</span>
+                <div>
+                    <strong>You get +3 free designs</strong><br>
+                    <small>Instant bonus when you join</small>
+                </div>
+            </div>
+            <div class="benefit">
+                <span class="benefit-icon">🎨</span>
+                <div>
+                    <strong>AI-powered decoration</strong><br>
+                    <small>7 festive styles to choose from</small>
+                </div>
+            </div>
+            <div class="benefit">
+                <span class="benefit-icon">⚡</span>
+                <div>
+                    <strong>Instant results</strong><br>
+                    <small>See your decorated space in seconds</small>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 32px;">
+            <a href="#" class="cta-button" id="download-button">Get HolidayHome AI</a>
+        </div>
+
+        <div class="loading" id="loading">Opening app...</div>
+    </div>
+
+    <script>
+        // Extract referral code from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const referralCode = urlParams.get('code') || window.location.pathname.split('/').pop() || 'WELCOME';
+
+        // Display referral code
+        document.getElementById('referral-code').textContent = referralCode;
+
+        // App Store URL (TODO: Replace with actual App Store URL when published)
+        const appStoreUrl = 'https://apps.apple.com/app/holidayhome-ai/id123456789';
+
+        // Deep link URL scheme
+        const deepLinkUrl = `holidayhomeai://r/${referralCode}`;
+
+        // Update download button
+        document.getElementById('download-button').href = appStoreUrl;
+
+        // Attempt to open app via deep link
+        function attemptDeepLink() {
+            // Try to open the app
+            window.location.href = deepLinkUrl;
+
+            // If app doesn't open in 2 seconds, assume it's not installed
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 2000);
+        }
+
+        // Attempt deep link on page load
+        if (referralCode && referralCode !== 'r.html') {
+            attemptDeepLink();
+        } else {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Also attempt on button click
+        document.getElementById('download-button').addEventListener('click', (e) => {
+            attemptDeepLink();
+        });
+    </script>
+</body>
+</html>

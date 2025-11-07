@@ -14,8 +14,7 @@ struct ResultView: View {
     @State private var showFullScreen = false
     @State private var celebrationParticles: [CelebrationParticle] = []
     @State private var showCelebration = false
-    @State private var showEmailSheet = false
-    @State private var emailInput = ""
+    @State private var showReferralSheet = false
     @State private var showAbout = false
     @Environment(\.accessibilityReduceMotion) var reduceMotion
 
@@ -122,6 +121,42 @@ struct ResultView: View {
                 .opacity(showCelebration ? 1.0 : 0.0)
                 .animation(AppAnimation.spring.delay(0.7), value: showCelebration)
 
+                // Invite Friends Button
+                Button(action: {
+                    showReferralSheet = true
+                    viewModel.generateOrGetReferralCode()
+                }) {
+                    HStack(spacing: AppSpacing.sm) {
+                        Image(systemName: "gift.fill")
+                            .font(.system(size: 18, weight: .semibold))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Invite Friends")
+                                .font(AppFonts.headline)
+                                .fontWeight(.semibold)
+
+                            Text("Get +\(AppConfig.referralRewardAmount) designs each")
+                                .font(AppFonts.caption)
+                                .opacity(0.85)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
+                            .opacity(0.5)
+                    }
+                    .foregroundColor(AppColors.primary)
+                    .padding(AppSpacing.md)
+                    .background(AppColors.accent)
+                    .cornerRadius(AppCornerRadius.md)
+                    .shadow(color: AppColors.deepShadow.opacity(0.2), radius: 8, x: 0, y: 4)
+                }
+                .accessibilityLabel("Invite friends to earn more designs")
+                .accessibilityHint("Share your referral link and both earn +\(AppConfig.referralRewardAmount) designs")
+                .opacity(showCelebration ? 1.0 : 0.0)
+                .animation(AppAnimation.spring.delay(0.75), value: showCelebration)
+
                 if !viewModel.products.isEmpty {
                     VStack(alignment: .leading, spacing: AppSpacing.sm) {
                         Text("Shop the look")
@@ -210,21 +245,9 @@ struct ResultView: View {
         // .sheet(isPresented: $showAbout) {
         //     AboutView()
         // }
-        .overlay(
-            Group {
-                if showEmailSheet && !viewModel.hasSubmittedEmail {
-                    EmailBottomSheet(
-                        isPresented: $showEmailSheet,
-                        email: $emailInput,
-                        isSubscribed: $viewModel.hasSubmittedEmail,
-                        onSubmit: {
-                            viewModel.subscribeToMainApp(email: emailInput)
-                        }
-                    )
-                    .transition(.move(edge: .bottom))
-                }
-            }
-        )
+        .sheet(isPresented: $showReferralSheet) {
+            ReferralBottomSheet(viewModel: viewModel)
+        }
         .onAppear {
             withAnimation {
                 showCelebration = true
@@ -234,10 +257,12 @@ struct ResultView: View {
                 generateCelebrationParticles()
             }
 
-            if !viewModel.hasSubmittedEmail && viewModel.generationsRemaining < 10 {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            // Auto-show referral prompt if user is running low on generations
+            if viewModel.generationsRemaining <= 1 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     withAnimation(.spring()) {
-                        showEmailSheet = true
+                        showReferralSheet = true
+                        viewModel.generateOrGetReferralCode()
                     }
                 }
             }

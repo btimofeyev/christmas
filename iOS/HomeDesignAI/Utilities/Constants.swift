@@ -92,6 +92,14 @@ enum AppConfig {
 
     // Timeouts
     static let apiTimeout: TimeInterval = 120 // 2 minutes for AI generation
+
+    // Generation limits and rewards
+    static let initialFreeGenerations = 3
+    static let referralRewardAmount = 3 // Both referrer and referee get this amount
+
+    // Referral system
+    static let referralBaseUrl = "https://holidayhomeai.app/r/"
+    static let appStoreUrl = "https://apps.apple.com/app/holidayhome-ai/id123456789" // TODO: Update with real App Store URL
 }
 
 // MARK: - Animation (2025 Apple Design - Spring Physics)

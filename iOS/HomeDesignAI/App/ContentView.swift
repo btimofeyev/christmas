@@ -65,6 +65,39 @@ struct ContentView: View {
         } message: {
             Text(viewModel.errorMessage)
         }
+        .alert("Referral Reward!", isPresented: $viewModel.showReferralReward) {
+            Button("Awesome!", role: .cancel) {}
+        } message: {
+            Text(viewModel.referralRewardMessage)
+        }
+        .onOpenURL { url in
+            handleDeepLink(url: url)
+        }
+    }
+
+    // MARK: - Deep Link Handling
+
+    private func handleDeepLink(url: URL) {
+        // Handle referral links: holidayhomeai://r/ABC123
+        // Also handle https://holidayhomeai.app/r/ABC123 (if Universal Links configured)
+
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
+            return
+        }
+
+        // Check for referral path
+        let path = components.path
+        if path.hasPrefix("/r/") || path.hasPrefix("r/") {
+            // Extract referral code
+            let code = path.replacingOccurrences(of: "/r/", with: "")
+                           .replacingOccurrences(of: "r/", with: "")
+                           .trimmingCharacters(in: .whitespaces)
+
+            if !code.isEmpty {
+                // Claim the referral code
+                viewModel.claimReferral(code: code)
+            }
+        }
     }
 }
 
