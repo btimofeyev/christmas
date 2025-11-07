@@ -68,7 +68,7 @@ router.post('/generate-referral', async (req, res) => {
     if (existingCode) {
       return res.json({
         code: existingCode,
-        shareUrl: `https://holidayhomeai.app/r/${existingCode}`,
+        shareUrl: `https://christmas-production-18fe.up.railway.app/r/${existingCode}`,
         message: 'Existing referral code returned'
       });
     }
@@ -95,7 +95,7 @@ router.post('/generate-referral', async (req, res) => {
 
     res.json({
       code: newCode,
-      shareUrl: `https://holidayhomeai.app/r/${newCode}`,
+      shareUrl: `https://christmas-production-18fe.up.railway.app/r/${newCode}`,
       message: 'Referral code generated successfully'
     });
 

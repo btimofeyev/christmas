@@ -8,7 +8,9 @@
       "Bash(sips -s hasAlpha no logo-1024.png)",
       "Bash(sips:*)",
       "Bash(rm:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(brew install:*)",
+      "Bash(sudo gem install:*)"
     ],
     "deny": [],
     "ask": []
