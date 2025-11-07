@@ -124,6 +124,16 @@ class HomeDesignViewModel: ObservableObject {
         myReferralCode = UserDefaults.standard.string(forKey: myReferralCodeKey)
         myReferralUrl = UserDefaults.standard.string(forKey: myReferralUrlKey)
 
+        // Migration: Clear old referral URLs that don't match current domain
+        if let existingUrl = myReferralUrl,
+           !existingUrl.contains("holidayhomeai.up.railway.app") {
+            // Clear old cached URL - will be regenerated with correct domain
+            myReferralUrl = nil
+            myReferralCode = nil
+            UserDefaults.standard.removeObject(forKey: myReferralCodeKey)
+            UserDefaults.standard.removeObject(forKey: myReferralUrlKey)
+        }
+
         // Load generation count from storage
         let storedGenerations = UserDefaults.standard.integer(forKey: generationsKey)
         if storedGenerations == 0 {

@@ -10,6 +10,9 @@ const __dirname = path.dirname(__filename);
 
 const REFERRALS_FILE = path.join(__dirname, '../data/referrals.json');
 
+// Referral base URL - configurable via environment variable
+const REFERRAL_BASE_URL = process.env.REFERRAL_BASE_URL || 'https://holidayhomeai.up.railway.app/r/';
+
 // Initialize referrals data structure
 const initializeReferralsFile = async () => {
   try {
@@ -68,7 +71,7 @@ router.post('/generate-referral', async (req, res) => {
     if (existingCode) {
       return res.json({
         code: existingCode,
-        shareUrl: `https://christmas-production-18fe.up.railway.app/r/${existingCode}`,
+        shareUrl: `${REFERRAL_BASE_URL}${existingCode}`,
         message: 'Existing referral code returned'
       });
     }
@@ -95,7 +98,7 @@ router.post('/generate-referral', async (req, res) => {
 
     res.json({
       code: newCode,
-      shareUrl: `https://christmas-production-18fe.up.railway.app/r/${newCode}`,
+      shareUrl: `${REFERRAL_BASE_URL}${newCode}`,
       message: 'Referral code generated successfully'
     });
 
