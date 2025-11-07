@@ -52,7 +52,9 @@ router.post('/', async (req, res) => {
       subscribers = JSON.parse(fileContent);
     } catch (error) {
       // File doesn't exist yet, start with empty array
-      console.log('📧 Creating new subscribers file');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('📧 Creating new subscribers file');
+      }
     }
 
     // Check for duplicate
@@ -71,7 +73,9 @@ router.post('/', async (req, res) => {
     // Save to file
     await fs.writeFile(emailsFilePath, JSON.stringify(subscribers, null, 2));
 
-    console.log(`✅ New subscriber: ${trimmedEmail} (Total: ${subscribers.length})`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`✅ New subscriber: ${trimmedEmail} (Total: ${subscribers.length})`);
+    }
 
     res.status(201).json({
       success: true,
@@ -80,7 +84,9 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Subscribe error:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('❌ Subscribe error:', error);
+    }
     res.status(500).json({
       error: 'Subscription failed',
       message: 'Unable to process your request. Please try again.'
@@ -88,23 +94,5 @@ router.post('/', async (req, res) => {
   }
 });
 
-/**
- * GET /subscribe/count
- * Get total subscriber count (for internal use)
- */
-router.get('/count', async (req, res) => {
-  try {
-    const emailsFilePath = path.join(__dirname, '../data/subscribers.json');
-    const fileContent = await fs.readFile(emailsFilePath, 'utf-8');
-    const subscribers = JSON.parse(fileContent);
-
-    res.json({
-      count: subscribers.length,
-      latestSubscription: subscribers[subscribers.length - 1]?.subscribedAt || null
-    });
-  } catch (error) {
-    res.json({ count: 0, latestSubscription: null });
-  }
-});
 
 export default router;

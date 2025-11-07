@@ -7,10 +7,6 @@ import { dirname, join } from 'path';
 
 const router = express.Router();
 
-// Test endpoint to verify route is working
-router.get('/', (req, res) => {
-  res.json({ message: 'Generate route is working! Use POST to generate images.' });
-});
 
 // Get current directory for loading product data
 const __filename = fileURLToPath(import.meta.url);
@@ -44,7 +40,6 @@ const __dirname = dirname(__filename);
  * }
  */
 router.post('/', async (req, res) => {
-  console.log('🎨 POST /generate hit! Body keys:', Object.keys(req.body));
   try {
     // Validate request
     const validation = validateGenerateRequest(req.body);
@@ -67,8 +62,6 @@ router.post('/', async (req, res) => {
         details: ['Could not extract base64 data from image']
       });
     }
-
-    console.log(`\n🎨 Generating ${style} decoration for ${scene} scene (${lighting} lighting, ${intensity} intensity)...`);
 
     // Step 1: Generate decorated image using Gemini
     const generatedImage = await generateDecoratedImage(
@@ -100,13 +93,14 @@ router.post('/', async (req, res) => {
 
       // If AI didn't find enough products, supplement with static fallback
       if (products.length < 4) {
-        console.log('⚠️  AI found fewer than 4 products, adding fallback products...');
         const fallbackProducts = await loadFallbackProducts(style);
         const needed = 4 - products.length;
         products = [...products, ...fallbackProducts.slice(0, needed)];
       }
     } catch (error) {
-      console.error('⚠️  Product detection failed, using fallback products:', error.message);
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('⚠️  Product detection failed, using fallback products:', error.message);
+      }
       // If product detection fails, use static fallback
       products = await loadFallbackProducts(style);
     }
@@ -125,13 +119,13 @@ router.post('/', async (req, res) => {
       }
     };
 
-    console.log('✅ Generation complete\n');
-
     // Return response (data is automatically cleared from memory after this)
     res.json(response);
 
   } catch (error) {
-    console.error('❌ Generate endpoint error:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('❌ Generate endpoint error:', error);
+    }
     res.status(500).json({
       error: 'Failed to generate decorated image',
       message: error.message
@@ -164,7 +158,9 @@ async function loadFallbackProducts(style) {
 
     return products;
   } catch (error) {
-    console.error('Error loading fallback products:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error loading fallback products:', error);
+    }
     // Return empty array if products file doesn't exist
     return [];
   }

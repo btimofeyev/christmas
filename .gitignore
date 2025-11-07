@@ -5,6 +5,14 @@ Backend/npm-debug.log*
 Backend/yarn-debug.log*
 Backend/yarn-error.log*
 
+# Backup files
+*.backup
+*.bak
+*.old
+*.tmp
+*.swp
+*~
+
 # Xcode
 iOS/*.xcodeproj/
 iOS/*.xcworkspace/
@@ -19,6 +27,10 @@ iOS/*.hmap
 iOS/*.ipa
 iOS/*.dSYM.zip
 iOS/*.dSYM
+
+# Xcode user data
+**/xcuserdata/
+**/xcshareddata/
 
 # iOS
 iOS/Pods/

@@ -17,8 +17,21 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Middleware
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['capacitor://localhost', 'ionic://localhost'];
+
 app.use(cors({
-  origin: '*', // For development - restrict in production
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
@@ -26,11 +39,13 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' })); // Allow larger payloads for base64 images
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Log all incoming requests for debugging
-app.use((req, res, next) => {
-  console.log(`📨 ${req.method} ${req.path} - Headers: ${JSON.stringify(req.headers)}`);
-  next();
-});
+// Log requests in development only
+if (process.env.NODE_ENV !== 'production') {
+  app.use((req, res, next) => {
+    console.log(`📨 ${req.method} ${req.path}`);
+    next();
+  });
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -42,14 +57,11 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes (MUST come before static files!)
-console.log('🔧 Registering API routes...');
 app.use('/generate', generateRouter);
 app.use('/subscribe', subscribeRouter);
-console.log('✅ API routes registered: /generate, /subscribe');
 
 // Serve static files from public directory (fallback - comes AFTER API routes)
 const publicPath = path.join(__dirname, '../public');
-console.log(`📁 Static files path: ${publicPath}`);
 app.use(express.static(publicPath));
 
 // Error handling middleware
@@ -68,14 +80,8 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`\n${'='.repeat(60)}`);
-  console.log(`🎄 HolidayHome AI Backend running on port ${PORT}`);
-  console.log(`${'='.repeat(60)}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-  console.log(`🎨 Generate endpoint: http://localhost:${PORT}/generate`);
-  console.log(`📧 Subscribe endpoint: http://localhost:${PORT}/subscribe`);
-  console.log(`📁 Serving static files from: ${publicPath}`);
-  console.log(`${'='.repeat(60)}\n`);
+  console.log(`🎄 HomeDesign AI Backend running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
 
 export default app;

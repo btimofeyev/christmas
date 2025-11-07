@@ -240,12 +240,14 @@ export async function generateDecoratedImage(
 
     parts.push({ text: basePrompt });
 
-    console.log('🎨 Generating image with Gemini...');
-    console.log(`   Model: gemini-2.5-flash-image`);
-    console.log(`   Style: ${style}`);
-    console.log(`   Scene: ${scene}`);
-    console.log(`   Intensity: ${intensity}`);
-    console.log(`   Lighting: ${lighting}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('🎨 Generating image with Gemini...');
+      console.log(`   Model: gemini-2.5-flash-image`);
+      console.log(`   Style: ${style}`);
+      console.log(`   Scene: ${scene}`);
+      console.log(`   Intensity: ${intensity}`);
+      console.log(`   Lighting: ${lighting}`);
+    }
 
     const aiClient = getAIClient();
     const response = await aiClient.models.generateContent({
@@ -266,7 +268,6 @@ export async function generateDecoratedImage(
     );
 
     if (imagePart && imagePart.inlineData) {
-      console.log('✅ Image generated successfully');
       return {
         imageBase64: imagePart.inlineData.data,
         mimeType: imagePart.inlineData.mimeType || 'image/png',
@@ -275,7 +276,9 @@ export async function generateDecoratedImage(
       throw new Error('No image data found in the API response.');
     }
   } catch (error) {
-    console.error('❌ Gemini API call failed:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('❌ Gemini API call failed:', error);
+    }
     throw new Error(
       'The AI model could not process the request. Please try a different prompt or image.'
     );
@@ -304,8 +307,6 @@ Focus on items like:
 - Other visible holiday decorations
 
 If fewer than 6 clear items are visible, return only those you can clearly identify. If no clear items are visible, return an empty array.`;
-
-    console.log('🔍 Analyzing image for product recommendations...');
 
     const aiClient = getAIClient();
     const response = await aiClient.models.generateContent({
@@ -349,15 +350,15 @@ If fewer than 6 clear items are visible, return only those you can clearly ident
 
     const jsonText = response.text.trim();
     if (!jsonText) {
-      console.log('⚠️  No products detected in image');
       return [];
     }
 
     const products = JSON.parse(jsonText);
-    console.log(`✅ Found ${products.length} product recommendations`);
     return products;
   } catch (error) {
-    console.error('❌ Failed to find similar products:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('❌ Failed to find similar products:', error);
+    }
     // Return empty array on failure so the UI doesn't break
     return [];
   }

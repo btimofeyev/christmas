@@ -333,25 +333,35 @@ class HomeDesignViewModel: ObservableObject {
 
         // Open affiliate link in Safari (modern API)
         guard let url = URL(string: product.link) else {
+            #if DEBUG
             print("❌ Invalid product URL: \(product.link)")
+            #endif
             showErrorMessage("Unable to open product link. Please try again.")
             return
         }
 
         // Validate URL scheme
         guard url.scheme == "http" || url.scheme == "https" else {
+            #if DEBUG
             print("❌ Invalid URL scheme: \(url.scheme ?? "none")")
+            #endif
             showErrorMessage("Invalid product link format.")
             return
         }
 
+        #if DEBUG
         print("🔗 Opening product link: \(url.absoluteString)")
+        #endif
 
         UIApplication.shared.open(url, options: [:]) { [weak self] success in
+            #if DEBUG
             if success {
                 print("✅ Opened affiliate link: \(product.name) at position \(position)")
             } else {
                 print("❌ Failed to open affiliate link: \(product.name)")
+            }
+            #endif
+            if !success {
                 // Note: On iOS Simulator, Safari may not have internet connectivity
                 // This will work properly on a real device
                 DispatchQueue.main.async {
@@ -472,7 +482,9 @@ class HomeDesignViewModel: ObservableObject {
                 // Email sent to backend for storage
             } catch {
                 // Fail silently - user already got their generations
+                #if DEBUG
                 print("Email backend error: \(error)")
+                #endif
             }
 
             isSubscribing = false
