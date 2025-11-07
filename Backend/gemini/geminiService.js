@@ -75,92 +75,92 @@ function getBaseStyleDescription(style, scene, intensity = 'medium') {
   const styleDescriptions = {
     classic_christmas: {
       exterior: [
-        `traditional Christmas elements like warm white or multicolor string lights, wreaths with red bows, red and gold garland, illuminated reindeer, candy cane lights`,
-        `timeless holiday decorations including festive string lights, classic wreaths, red ribbons, golden garland, illuminated figures, pathway decorations`,
-        `traditional festive touches such as twinkling lights, evergreen wreaths with bows, metallic garland, light-up characters, decorative stakes`,
+        `traditional Christmas decorations in warm whites, reds, and golds - including string lights, wreaths with bows, garland, and seasonal outdoor accents appropriate for this exterior`,
+        `timeless holiday elements in classic red, green, and gold colors - such as festive lighting, wreaths, ribbons, and decorative touches that suit this outdoor space`,
+        `traditional festive decorations featuring warm lights, evergreen wreaths, metallic accents, and classic seasonal elements fitting for this home's exterior`,
       ],
       interior: [
-        `classic holiday decor including a Christmas tree with red, gold, and green ornaments, garland on mantles, stockings, string lights, poinsettias`,
-        `traditional Christmas decorations like an ornament-filled tree, festive garland, holiday stockings, warm lights, seasonal florals, classic accents`,
-        `timeless holiday elements such as a decorated tree, ribbon garland, hanging stockings, twinkling lights, red flowers, nostalgic ornaments`,
+        `classic Christmas decorations in traditional red, gold, and green colors - choosing items appropriate for this specific room such as festive textiles, garland, string lights, seasonal accents, and decorative pieces that naturally fit the space`,
+        `traditional holiday decor in warm festive colors - selecting room-appropriate items like holiday linens, garland swags, twinkling lights, seasonal florals, and classic ornamental touches`,
+        `timeless Christmas elements in classic holiday colors - placing contextually fitting decorations such as festive fabrics, ribbon accents, warm lighting, and traditional seasonal pieces`,
       ],
       mood: 'warm and traditionally festive',
     },
     nordic_minimalist: {
       exterior: [
-        `minimalist Nordic decorations like simple white LED lights, natural pine wreaths, white and wood accents`,
-        `Scandinavian-inspired elements including clean white lights, understated natural wreaths, subtle wooden decorations`,
-        `minimal Nordic touches such as cool white lights, simple evergreen arrangements, natural materials, geometric shapes`,
+        `minimalist Nordic Christmas decorations in whites and natural wood tones - simple LED lights, understated wreaths, and clean-lined seasonal accents for this exterior`,
+        `Scandinavian-inspired holiday elements with restraint - cool white lights, natural evergreen touches, and minimal wooden accents suited to this outdoor space`,
+        `minimal Nordic festive touches in neutral tones - simple lighting, natural wreaths, and geometric shapes appropriate for this home's exterior`,
       ],
       interior: [
-        `Nordic-inspired decor including a natural pine tree with minimal ornaments, white candles, evergreen branches, white textiles, geometric shapes`,
-        `Scandinavian minimalist decorations like a simple tree with wooden ornaments, candles in holders, natural greenery, white linens, clean-lined accents`,
-        `understated Nordic elements such as a sparse evergreen tree, simple candlelight, natural branches, neutral textiles, minimal geometric ornaments`,
+        `Nordic-inspired Christmas decor with Scandinavian minimalism - selecting room-appropriate items like white candles, minimal evergreen branches, natural textiles, and understated geometric accents that fit this specific space`,
+        `Scandinavian minimalist holiday decorations in whites and naturals - choosing contextually fitting elements such as simple candlelight, natural greenery, neutral linens, and clean-lined seasonal touches`,
+        `understated Nordic Christmas elements with restraint - placing appropriate decorations like sparse natural branches, minimal candlelight, white textiles, and geometric ornaments suited to this room`,
       ],
       mood: 'clean, serene, and understated with Scandinavian simplicity',
     },
     modern_silver: {
       exterior: [
-        `modern metallic decorations including cool white LED icicle lights, sleek silver wreaths, illuminated silver spheres, metallic garland`,
-        `contemporary silver elements like crisp white lights, modern silver and chrome wreaths, geometric light displays, metallic accents`,
-        `elegant modern decor such as LED icicle lights, minimalist silver wreaths, illuminated metallic ornaments, sleek garland`,
+        `modern metallic Christmas decorations in cool whites and silvers - sleek LED lights, contemporary wreaths, and geometric seasonal accents for this exterior`,
+        `contemporary silver holiday elements with clean lines - crisp white lighting, modern metallic wreaths, and minimalist decorative touches suited to this outdoor space`,
+        `elegant modern festive decor in silvers and whites - LED icicle lights, sleek wreaths, and geometric ornamental accents appropriate for this home's exterior`,
       ],
       interior: [
-        `modern silver Christmas decorations including a tree with metallic ornaments, geometric decor, cool LED lights, silver garland, chrome accents`,
-        `contemporary metallic elements like a sleek tree with silver and white ornaments, modern shapes, cool-toned lights, metallic ribbons, glass accents`,
-        `elegant modern decor such as a stylish tree with chrome ornaments, geometric decorations, LED accents, silver garland, reflective elements`,
+        `modern silver Christmas decorations with contemporary style - selecting room-appropriate items like metallic accents, geometric decor, cool LED lighting, and sleek ornamental pieces that naturally fit this specific space`,
+        `contemporary metallic holiday elements in silvers and whites - choosing contextually fitting decorations such as modern ornamental accents, geometric shapes, cool-toned lights, and reflective elements`,
+        `elegant modern Christmas decor with clean lines - placing appropriate items like chrome accents, minimalist geometric pieces, LED lighting, and sophisticated metallic touches suited to this room`,
       ],
       mood: 'elegant, contemporary, and sophisticated',
     },
     cozy_family: {
       exterior: [
-        `cozy family decorations including warm amber and multicolor lights, colorful wreaths, illuminated inflatables, light-up characters, playful pathway lights, rustic signs`,
-        `welcoming holiday elements like cheerful string lights, festive wreaths, whimsical figures, lighted decorations, candy cane markers, wooden accents`,
-        `playful festive decor such as multicolor lights, vibrant wreaths, fun inflatable characters, illuminated yard decorations, festive pathway lights, rustic touches`,
+        `cozy family Christmas decorations in warm colors and playful styles - welcoming lights, cheerful wreaths, whimsical figures, and festive accents for this exterior`,
+        `warm inviting holiday elements with playful touches - multicolor string lights, vibrant wreaths, fun seasonal figures, and rustic accents suited to this outdoor space`,
+        `playful festive outdoor decor in warm tones - cheerful lighting, colorful wreaths, whimsical decorative characters, and welcoming seasonal touches appropriate for this home's exterior`,
       ],
       interior: [
-        `cozy family decorations including a warmly lit tree with colorful ornaments, ambient string lights, plush throws, festive pillows, rustic wood decor, handmade ornaments, stockings`,
-        `warm inviting elements like a bright tree with diverse ornaments, glowing string lights, soft textiles, holiday pillows, natural wood pieces, personal touches, hanging stockings`,
-        `playful cozy decor such as a cheerful tree with vibrant ornaments, twinkling lights, comfortable throws, festive cushions, wooden decorations, crafted ornaments, traditional stockings`,
+        `cozy family Christmas decorations in warm, inviting colors - selecting room-appropriate items like ambient lighting, plush textiles, festive pillows, rustic wood accents, and cheerful ornamental touches that naturally fit this specific space`,
+        `warm inviting holiday elements with personal touches - choosing contextually fitting decorations such as soft throws, holiday cushions, glowing string lights, natural wood pieces, and handmade seasonal accents`,
+        `playful cozy Christmas decor in vibrant warm tones - placing appropriate items like comfortable textiles, festive fabrics, twinkling lights, wooden decorations, and cheerful ornamental pieces suited to this room`,
       ],
       mood: 'warm, inviting, and playfully festive',
     },
     rustic_farmhouse: {
       exterior: [
-        `rustic farmhouse decorations including warm white lights, natural evergreen wreaths with burlap, wooden signs, galvanized metal accents, plaid ribbons, vintage lanterns`,
-        `country-style holiday elements like Edison bulb string lights, natural greenery with burlap bows, weathered wood decorations, metal stars, buffalo check patterns, rustic lanterns`,
-        `farmhouse festive touches such as warm vintage lights, pine and burlap wreaths, distressed wood signs, barn-style accents, country ribbons, antique lanterns`,
+        `rustic farmhouse Christmas decorations in natural materials and warm tones - vintage-style lights, evergreen wreaths with burlap, wooden signs, and country accents for this exterior`,
+        `country-style holiday elements with authentic farmhouse charm - Edison bulb lights, natural greenery with rustic bows, weathered wood pieces, and barn-inspired touches suited to this outdoor space`,
+        `farmhouse festive decor with rustic textures - warm vintage lighting, natural wreaths, distressed wood signs, and country seasonal accents appropriate for this home's exterior`,
       ],
       interior: [
-        `rustic farmhouse Christmas decor including a tree with burlap ribbons and wooden ornaments, galvanized metal accents, plaid textiles, natural greenery, vintage signs, farmhouse stockings`,
-        `country holiday decorations like a tree with natural and wooden ornaments, metal containers, buffalo check fabrics, evergreen arrangements, distressed wood pieces, rustic stockings`,
-        `farmhouse festive elements such as a tree with burlap and wood accents, vintage metal decor, plaid throws, natural branches, barn-inspired decorations, country stockings`,
+        `rustic farmhouse Christmas decor with natural textures - selecting room-appropriate items like burlap accents, wooden ornamental pieces, galvanized metal containers, plaid textiles, natural greenery, and vintage-inspired decorations that naturally fit this specific space`,
+        `country holiday decorations with authentic farmhouse style - choosing contextually fitting elements such as natural and wooden accents, metal containers, buffalo check fabrics, evergreen arrangements, and distressed wood pieces`,
+        `farmhouse festive elements with rustic charm - placing appropriate items like burlap and wood accents, vintage metal decor, plaid throws, natural branches, and barn-inspired seasonal touches suited to this room`,
       ],
       mood: 'warm, rustic, and authentically country',
     },
     elegant_gold: {
       exterior: [
-        `elegant gold decorations including warm white lights, luxurious gold and white wreaths, metallic gold garland, champagne-colored ornaments, sophisticated lighting`,
-        `upscale holiday elements like refined white lights, gold and cream wreaths, metallic gold ribbons, elegant ornamental displays, sophisticated accents`,
-        `luxurious festive touches such as pristine white lights, gold-adorned wreaths, shimmering gold garland, elegant ornaments, refined decorative elements`,
+        `elegant gold Christmas decorations in luxurious metallics and creams - refined warm white lights, gold-adorned wreaths, sophisticated garland, and upscale seasonal accents for this exterior`,
+        `upscale holiday elements in golds and ivories - pristine white lighting, luxurious metallic wreaths, elegant ribbons, and refined decorative touches suited to this outdoor space`,
+        `luxurious festive decor in champagne and gold tones - sophisticated lighting, gold-embellished wreaths, shimmering garland, and elegant ornamental accents appropriate for this home's exterior`,
       ],
       interior: [
-        `elegant gold Christmas decorations including a tree with gold, white, and cream ornaments, metallic gold garland, champagne-colored ribbons, luxurious textiles, sophisticated accents`,
-        `upscale holiday decor like a refined tree with gold and ivory ornaments, shimmering gold garland, elegant ribbons, plush fabrics, sophisticated decorative pieces`,
-        `luxurious festive elements such as a stylish tree with metallic gold and white ornaments, gleaming garland, rich ribbons, elegant textiles, refined accents`,
+        `elegant gold Christmas decorations in luxurious metallics - selecting room-appropriate items like gold ornamental accents, metallic garland, champagne-colored textiles, plush fabrics, and sophisticated decorative pieces that naturally fit this specific space`,
+        `upscale holiday decor in golds, creams, and ivories - choosing contextually fitting elements such as refined metallic accents, shimmering garland, elegant ribbons, luxurious textiles, and sophisticated ornamental touches`,
+        `luxurious festive elements in champagne and gold - placing appropriate items like gleaming metallic accents, rich ribbons, elegant textiles, gold ornamental pieces, and refined decorative touches suited to this room`,
       ],
       mood: 'elegant, luxurious, and sophisticated',
     },
     colorful_whimsical: {
       exterior: [
-        `colorful whimsical decorations including rainbow multicolor lights, bright bold wreaths, playful yard decorations, colorful inflatables, vibrant ribbons, fun character displays`,
-        `playful festive elements like cheerful multicolor lights, rainbow wreaths, whimsical figures, bright decorations, colorful accents, fun light-up displays`,
-        `vibrant holiday touches such as rainbow string lights, colorful bold wreaths, playful decorative figures, bright inflatables, multicolor ribbons, joyful displays`,
+        `colorful whimsical Christmas decorations in bright, joyful hues - rainbow multicolor lights, bold vibrant wreaths, playful seasonal figures, and fun festive accents for this exterior`,
+        `playful festive elements in rainbow colors - cheerful multicolor lighting, bright bold wreaths, whimsical decorative characters, and vibrant seasonal touches suited to this outdoor space`,
+        `vibrant holiday decor in bold, joyful colors - rainbow string lights, colorful wreaths, playful figures, and cheerful festive accents appropriate for this home's exterior`,
       ],
       interior: [
-        `colorful whimsical Christmas decor including a tree with bright multicolor ornaments, rainbow lights, playful decorations, vibrant ribbons, fun patterned textiles, cheerful accents`,
-        `playful festive elements like a joyful tree with diverse colorful ornaments, rainbow string lights, whimsical decorations, bright ribbons, fun fabrics, cheerful pieces`,
-        `vibrant holiday decorations such as a bright tree with rainbow ornaments, multicolor lights, playful accents, colorful ribbons, bold textiles, fun decorative elements`,
+        `colorful whimsical Christmas decor in bright, playful hues - selecting room-appropriate items like vibrant textiles, rainbow lighting, fun patterned fabrics, cheerful ornamental accents, and bold decorative pieces that naturally fit this specific space`,
+        `playful festive elements in rainbow colors - choosing contextually fitting decorations such as bright ribbons, multicolor lights, fun fabrics, whimsical accents, and joyful ornamental touches`,
+        `vibrant holiday decorations in bold, cheerful colors - placing appropriate items like colorful textiles, rainbow accents, playful ornamental pieces, bright ribbons, and fun decorative elements suited to this room`,
       ],
       mood: 'joyful, vibrant, and playfully festive',
     },
@@ -175,8 +175,13 @@ function getBaseStyleDescription(style, scene, intensity = 'medium') {
   const variations = isExterior ? styleData.exterior : styleData.interior;
   const selectedVariation = variations[Math.floor(Math.random() * variations.length)];
 
+  // Add contextual awareness for interior spaces
+  const contextGuidance = isExterior
+    ? ''
+    : ' Analyze the room type and function in the image, then select decorations that make sense for that specific space - for example, festive table settings and centerpieces for dining rooms, countertop decorations and kitchen towels for kitchens, subtle accents for bathrooms, cozy textiles and ambient decorations for bedrooms, and traditional decorations for living rooms. Avoid adding large items like Christmas trees in spaces where they would not naturally fit or be practical.';
+
   // Build the full description
-  return `Add ${intensityGuide.coverage} ${selectedVariation}. ${intensityGuide.approach} with ${intensityGuide.quantity}. ${preserve} The result should be ${intensityGuide.descriptor} and ${styleData.mood}.`;
+  return `Add ${intensityGuide.coverage} ${selectedVariation}. ${intensityGuide.approach} with ${intensityGuide.quantity}.${contextGuidance} ${preserve} The result should be ${intensityGuide.descriptor} and ${styleData.mood}.`;
 }
 
 /**
@@ -217,13 +222,17 @@ export async function generateDecoratedImage(
     // Build the prompt
     let basePrompt;
     if (style === 'custom') {
-      // Custom prompt with intensity awareness
+      // Custom prompt with intensity awareness and contextual guidance
       const intensityGuide = getIntensityGuidance(intensity);
       const preserve = scene === 'exterior'
         ? 'Maintain the original house architecture and structure.'
         : 'Maintain the original room structure and architecture.';
 
-      basePrompt = `As an expert ${designerType} specializing in Christmas decorations, ${customPrompt}. ${intensityGuide.approach} with ${intensityGuide.quantity} to create a ${intensityGuide.descriptor} look. ${preserve}`;
+      const contextGuidance = scene === 'exterior'
+        ? ''
+        : ' Analyze the room type and function in the image, then select decorations that make sense for that specific space - for example, festive table settings and centerpieces for dining rooms, countertop decorations and kitchen towels for kitchens, subtle accents for bathrooms, cozy textiles and ambient decorations for bedrooms. Avoid adding large items like Christmas trees in spaces where they would not naturally fit or be practical.';
+
+      basePrompt = `As an expert ${designerType} specializing in Christmas decorations, ${customPrompt}. ${intensityGuide.approach} with ${intensityGuide.quantity} to create a ${intensityGuide.descriptor} look.${contextGuidance} ${preserve}`;
     } else {
       // Use base style description with intensity
       const styleDescription = getBaseStyleDescription(style, scene, intensity);
