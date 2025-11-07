@@ -4,7 +4,11 @@
       "Bash(tree:*)",
       "Bash(cat:*)",
       "Bash(find:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(sips -s hasAlpha no logo-1024.png)",
+      "Bash(sips:*)",
+      "Bash(rm:*)",
+      "Bash(mv:*)"
     ],
     "deny": [],
     "ask": []

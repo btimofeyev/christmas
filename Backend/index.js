@@ -26,21 +26,21 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' })); // Allow larger payloads for base64 images
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, '../public')));
-
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'HomeDesign AI Backend',
+    service: 'HolidayHome AI Backend',
     timestamp: new Date().toISOString()
   });
 });
 
-// Routes
+// API Routes (MUST come before static files!)
 app.use('/generate', generateRouter);
 app.use('/subscribe', subscribeRouter);
+
+// Serve static files from public directory (fallback - comes AFTER API routes)
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
