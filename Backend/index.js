@@ -17,19 +17,42 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Log ALL incoming requests BEFORE CORS (so we can see blocked requests too)
+app.use((req, res, next) => {
+  console.log('🌐 Incoming request:', {
+    method: req.method,
+    path: req.path,
+    origin: req.headers.origin || 'NO ORIGIN HEADER',
+    userAgent: req.headers['user-agent'],
+    contentType: req.headers['content-type']
+  });
+  next();
+});
+
 // Middleware
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
   : ['capacitor://localhost', 'ionic://localhost'];
 
+console.log('🔒 CORS Configuration:', {
+  allowedOrigins,
+  fromEnv: !!process.env.ALLOWED_ORIGINS
+});
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('✅ CORS: Allowing request with no origin');
+      return callback(null, true);
+    }
 
     if (allowedOrigins.includes(origin)) {
+      console.log('✅ CORS: Allowing origin:', origin);
       callback(null, true);
     } else {
+      console.error('❌ CORS: Blocking origin:', origin);
+      console.error('   Allowed origins:', allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
