@@ -98,7 +98,7 @@ enum AppConfig {
     static let referralRewardAmount = 3 // Both referrer and referee get this amount
 
     // Referral system
-    static let referralBaseUrl = "https://holidayhomeai.app/r/"
+    static let referralBaseUrl = "https://christmas-production-18fe.up.railway.app/r/"
     static let appStoreUrl = "https://apps.apple.com/app/holidayhome-ai/id123456789" // TODO: Update with real App Store URL
 }
 
