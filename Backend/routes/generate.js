@@ -40,10 +40,21 @@ const __dirname = dirname(__filename);
  * }
  */
 router.post('/', async (req, res) => {
+  console.log('📥 /generate request received:', {
+    scene: req.body.scene,
+    style: req.body.style,
+    lighting: req.body.lighting,
+    intensity: req.body.intensity,
+    hasPrompt: !!req.body.prompt,
+    hasImage: !!req.body.image_base64,
+    imageLength: req.body.image_base64?.length || 0
+  });
+
   try {
     // Validate request
     const validation = validateGenerateRequest(req.body);
     if (!validation.valid) {
+      console.error('❌ Validation failed:', validation.errors);
       return res.status(400).json({
         error: 'Invalid request',
         details: validation.errors
@@ -57,11 +68,14 @@ router.post('/', async (req, res) => {
     const mimeType = getMimeType(image_base64);
 
     if (!base64Data) {
+      console.error('❌ Could not extract base64 data from image');
       return res.status(400).json({
         error: 'Invalid image format',
         details: ['Could not extract base64 data from image']
       });
     }
+
+    console.log('✅ Validation passed, calling generateDecoratedImage...');
 
     // Step 1: Generate decorated image using Gemini
     const generatedImage = await generateDecoratedImage(
@@ -73,6 +87,8 @@ router.post('/', async (req, res) => {
       lighting,
       intensity
     );
+
+    console.log('✅ Image generated successfully, size:', generatedImage.imageBase64?.length || 0);
 
     // Step 2: Analyze generated image for product recommendations
     let products = [];
@@ -123,9 +139,14 @@ router.post('/', async (req, res) => {
     res.json(response);
 
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('❌ Generate endpoint error:', error);
-    }
+    console.error('❌ Generate endpoint error!');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error status:', error.status);
+    console.error('Error stack:', error.stack);
+    console.error('Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+
     res.status(500).json({
       error: 'Failed to generate decorated image',
       message: error.message

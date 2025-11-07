@@ -204,6 +204,16 @@ export async function generateDecoratedImage(
   lighting = 'day',
   intensity = 'medium'
 ) {
+  console.log('🎨 generateDecoratedImage called with:', {
+    style,
+    scene,
+    intensity,
+    lighting,
+    mimeType,
+    imageSize: imageBase64?.length || 0,
+    hasCustomPrompt: !!customPrompt
+  });
+
   try {
     const parts = [
       {
@@ -249,14 +259,8 @@ export async function generateDecoratedImage(
 
     parts.push({ text: basePrompt });
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('🎨 Generating image with Gemini...');
-      console.log(`   Model: gemini-2.5-flash-image`);
-      console.log(`   Style: ${style}`);
-      console.log(`   Scene: ${scene}`);
-      console.log(`   Intensity: ${intensity}`);
-      console.log(`   Lighting: ${lighting}`);
-    }
+    console.log('📝 Prompt being sent to Gemini:', basePrompt.substring(0, 200) + '...');
+    console.log('🚀 Calling Gemini API...');
 
     const aiClient = getAIClient();
     const response = await aiClient.models.generateContent({
@@ -265,6 +269,12 @@ export async function generateDecoratedImage(
       config: {
         responseModalities: [Modality.IMAGE],
       },
+    });
+
+    console.log('✅ Gemini API response received:', {
+      hasCandidates: !!response.candidates,
+      candidatesLength: response.candidates?.length,
+      firstCandidateHasContent: !!response.candidates?.[0]?.content
     });
 
     const firstCandidate = response.candidates?.[0];
@@ -285,12 +295,23 @@ export async function generateDecoratedImage(
       throw new Error('No image data found in the API response.');
     }
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('❌ Gemini API call failed:', error);
+    console.error('❌ Gemini API call failed!');
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error status:', error.status);
+    console.error('Error stack:', error.stack);
+
+    // Log the full error object
+    console.error('Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+
+    // If there's a response from the API, log it
+    if (error.response) {
+      console.error('API Response:', JSON.stringify(error.response, null, 2));
     }
-    throw new Error(
-      'The AI model could not process the request. Please try a different prompt or image.'
-    );
+
+    // Re-throw with original error details
+    throw error;
   }
 }
 
