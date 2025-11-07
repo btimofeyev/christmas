@@ -7,6 +7,11 @@ import { dirname, join } from 'path';
 
 const router = express.Router();
 
+// Test endpoint to verify route is working
+router.get('/', (req, res) => {
+  res.json({ message: 'Generate route is working! Use POST to generate images.' });
+});
+
 // Get current directory for loading product data
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -39,6 +44,7 @@ const __dirname = dirname(__filename);
  * }
  */
 router.post('/', async (req, res) => {
+  console.log('🎨 POST /generate hit! Body keys:', Object.keys(req.body));
   try {
     // Validate request
     const validation = validateGenerateRequest(req.body);
