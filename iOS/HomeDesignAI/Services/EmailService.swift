@@ -37,7 +37,7 @@ class EmailService {
         #if DEBUG
         return "http://localhost:3000"
         #else
-        return "https://your-backend-url.com" // Update with production URL
+        return "https://holidayhomeai.up.railway.app"
         #endif
     }
 

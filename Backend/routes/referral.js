@@ -1,43 +1,11 @@
 import express from 'express';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import { query, getOrCreateUser, updateUserGenerations } from '../db/database.js';
 
 const router = express.Router();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const REFERRALS_FILE = path.join(__dirname, '../data/referrals.json');
 
 // Referral base URL - configurable via environment variable
 const REFERRAL_BASE_URL = process.env.REFERRAL_BASE_URL || 'https://holidayhomeai.up.railway.app/r/';
-
-// Initialize referrals data structure
-const initializeReferralsFile = async () => {
-  try {
-    await fs.access(REFERRALS_FILE);
-  } catch {
-    // File doesn't exist, create it
-    const initialData = {
-      codes: {},      // { code: { deviceId, createdAt, totalClaims } }
-      claims: []      // [{ code, claimerDeviceId, claimedAt }]
-    };
-    await fs.writeFile(REFERRALS_FILE, JSON.stringify(initialData, null, 2));
-  }
-};
-
-// Read referrals data
-const readReferrals = async () => {
-  await initializeReferralsFile();
-  const data = await fs.readFile(REFERRALS_FILE, 'utf8');
-  return JSON.parse(data);
-};
-
-// Write referrals data
-const writeReferrals = async (data) => {
-  await fs.writeFile(REFERRALS_FILE, JSON.stringify(data, null, 2));
-};
 
 // Generate unique 6-character referral code
 const generateReferralCode = () => {
@@ -61,14 +29,17 @@ router.post('/generate-referral', async (req, res) => {
       });
     }
 
-    const referrals = await readReferrals();
+    // Ensure user exists in database
+    await getOrCreateUser(deviceId);
 
     // Check if this device already has a code
-    const existingCode = Object.keys(referrals.codes).find(
-      code => referrals.codes[code].deviceId === deviceId
+    const existingResult = await query(
+      'SELECT code FROM referrals WHERE device_id = $1',
+      [deviceId]
     );
 
-    if (existingCode) {
+    if (existingResult.rows.length > 0) {
+      const existingCode = existingResult.rows[0].code;
       return res.json({
         code: existingCode,
         shareUrl: `${REFERRAL_BASE_URL}${existingCode}`,
@@ -79,22 +50,27 @@ router.post('/generate-referral', async (req, res) => {
     // Generate new unique code
     let newCode;
     let attempts = 0;
-    do {
+    let codeExists = true;
+
+    while (codeExists && attempts < 10) {
       newCode = generateReferralCode();
+      const checkResult = await query(
+        'SELECT code FROM referrals WHERE code = $1',
+        [newCode]
+      );
+      codeExists = checkResult.rows.length > 0;
       attempts++;
-      if (attempts > 10) {
-        throw new Error('Failed to generate unique referral code');
-      }
-    } while (referrals.codes[newCode]);
+    }
+
+    if (attempts >= 10) {
+      throw new Error('Failed to generate unique referral code');
+    }
 
     // Store new code
-    referrals.codes[newCode] = {
-      deviceId,
-      createdAt: new Date().toISOString(),
-      totalClaims: 0
-    };
-
-    await writeReferrals(referrals);
+    await query(
+      'INSERT INTO referrals (code, device_id, total_claims) VALUES ($1, $2, 0)',
+      [newCode, deviceId]
+    );
 
     res.json({
       code: newCode,
@@ -123,55 +99,79 @@ router.post('/claim-referral', async (req, res) => {
       });
     }
 
-    const referrals = await readReferrals();
-
     // Validate referral code exists
-    if (!referrals.codes[code]) {
+    const referralResult = await query(
+      'SELECT * FROM referrals WHERE code = $1',
+      [code]
+    );
+
+    if (referralResult.rows.length === 0) {
       return res.status(404).json({
         error: 'Invalid referral code'
       });
     }
 
-    const referralData = referrals.codes[code];
+    const referralData = referralResult.rows[0];
 
     // Check if user is trying to claim their own code
-    if (referralData.deviceId === claimerDeviceId) {
+    if (referralData.device_id === claimerDeviceId) {
       return res.status(400).json({
         error: 'Cannot claim your own referral code'
       });
     }
 
     // Check if this device has already claimed this code
-    const alreadyClaimed = referrals.claims.some(
-      claim => claim.code === code && claim.claimerDeviceId === claimerDeviceId
+    const claimCheck = await query(
+      'SELECT * FROM claims WHERE code = $1 AND claimer_device_id = $2',
+      [code, claimerDeviceId]
     );
 
-    if (alreadyClaimed) {
+    if (claimCheck.rows.length > 0) {
       return res.status(400).json({
         error: 'You have already claimed this referral code'
       });
     }
 
+    // Ensure both users exist in database
+    const claimer = await getOrCreateUser(claimerDeviceId);
+    const referrer = await getOrCreateUser(referralData.device_id);
+
     // Record the claim
-    referrals.claims.push({
-      code,
-      claimerDeviceId,
-      claimedAt: new Date().toISOString()
-    });
+    await query(
+      'INSERT INTO claims (code, claimer_device_id) VALUES ($1, $2)',
+      [code, claimerDeviceId]
+    );
 
     // Increment total claims for this code
-    referrals.codes[code].totalClaims += 1;
+    await query(
+      'UPDATE referrals SET total_claims = total_claims + 1 WHERE code = $1',
+      [code]
+    );
 
-    await writeReferrals(referrals);
+    // Award +3 generations to both claimer and referrer
+    const claimerReward = 3;
+    const referrerReward = 3;
+
+    await updateUserGenerations(
+      claimerDeviceId,
+      claimer.generations_remaining + claimerReward,
+      claimer.total_generated
+    );
+
+    await updateUserGenerations(
+      referralData.device_id,
+      referrer.generations_remaining + referrerReward,
+      referrer.total_generated
+    );
 
     res.json({
       success: true,
       message: 'Referral claimed successfully',
       reward: {
-        claimer: 3,    // New user gets +3 generations
-        referrer: 3    // Original user gets +3 generations
+        claimer: claimerReward,
+        referrer: referrerReward
       },
-      referrerDeviceId: referralData.deviceId
+      referrerDeviceId: referralData.device_id
     });
 
   } catch (error) {
@@ -184,27 +184,35 @@ router.post('/claim-referral', async (req, res) => {
 });
 
 // GET /referral-stats/:code
-// Get statistics for a referral code (optional - for future analytics)
+// Get statistics for a referral code
 router.get('/referral-stats/:code', async (req, res) => {
   try {
     const { code } = req.params;
-    const referrals = await readReferrals();
 
-    if (!referrals.codes[code]) {
+    const referralResult = await query(
+      'SELECT * FROM referrals WHERE code = $1',
+      [code]
+    );
+
+    if (referralResult.rows.length === 0) {
       return res.status(404).json({
         error: 'Referral code not found'
       });
     }
 
-    const codeData = referrals.codes[code];
-    const claims = referrals.claims.filter(claim => claim.code === code);
+    const codeData = referralResult.rows[0];
+
+    const claimsResult = await query(
+      'SELECT claimed_at FROM claims WHERE code = $1',
+      [code]
+    );
 
     res.json({
       code,
-      createdAt: codeData.createdAt,
-      totalClaims: codeData.totalClaims,
-      claims: claims.map(c => ({
-        claimedAt: c.claimedAt
+      createdAt: codeData.created_at,
+      totalClaims: codeData.total_claims,
+      claims: claimsResult.rows.map(c => ({
+        claimedAt: c.claimed_at
         // Don't expose device IDs for privacy
       }))
     });
@@ -213,6 +221,57 @@ router.get('/referral-stats/:code', async (req, res) => {
     console.error('Error fetching referral stats:', error);
     res.status(500).json({
       error: 'Failed to fetch referral statistics'
+    });
+  }
+});
+
+// GET /stats/:deviceId
+// Get user's referral stats by device ID
+router.get('/stats/:deviceId', async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+
+    // Get user's referral code
+    const referralResult = await query(
+      'SELECT code, total_claims, created_at FROM referrals WHERE device_id = $1',
+      [deviceId]
+    );
+
+    if (referralResult.rows.length === 0) {
+      return res.status(404).json({
+        error: 'No referral code found for this device',
+        hasCode: false
+      });
+    }
+
+    const referralData = referralResult.rows[0];
+
+    // Get user's generation stats
+    const userResult = await query(
+      'SELECT generations_remaining, total_generated FROM users WHERE device_id = $1',
+      [deviceId]
+    );
+
+    const userData = userResult.rows[0] || { generations_remaining: 0, total_generated: 0 };
+
+    // Calculate designs earned from referrals (3 per referral claimed)
+    const designsEarnedFromReferrals = referralData.total_claims * 3;
+
+    res.json({
+      hasCode: true,
+      code: referralData.code,
+      shareUrl: `${REFERRAL_BASE_URL}${referralData.code}`,
+      totalReferrals: referralData.total_claims,
+      designsEarnedFromReferrals,
+      generationsRemaining: userData.generations_remaining,
+      totalGenerated: userData.total_generated,
+      createdAt: referralData.created_at
+    });
+
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    res.status(500).json({
+      error: 'Failed to fetch user statistics'
     });
   }
 });

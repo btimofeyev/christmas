@@ -52,7 +52,9 @@ class HomeDesignViewModel: ObservableObject {
 
     // Generation Limits
     @Published var generationsRemaining: Int = AppConfig.initialFreeGenerations
+    @Published var totalDesignsGenerated: Int = 0
     private let generationsKey = "user_generations_remaining"
+    private let totalGeneratedKey = "total_designs_generated"
     private let myReferralCodeKey = "my_referral_code"
     private let myReferralUrlKey = "my_referral_url"
     private let claimedReferralCodesKey = "claimed_referral_codes"
@@ -143,6 +145,9 @@ class HomeDesignViewModel: ObservableObject {
         } else {
             generationsRemaining = storedGenerations
         }
+
+        // Load total designs generated
+        totalDesignsGenerated = UserDefaults.standard.integer(forKey: totalGeneratedKey)
     }
 
     // MARK: - Navigation
@@ -276,7 +281,17 @@ class HomeDesignViewModel: ObservableObject {
                     decoratedImage = decoratedUIImage
                     products = response.products
 
-                    // Generation count already decremented optimistically at start
+                    // Sync generation count from backend (backend is source of truth)
+                    if let remaining = response.generationsRemaining {
+                        generationsRemaining = remaining
+                        saveGenerationCount()
+                    }
+
+                    // Sync total designs generated from backend
+                    if let total = response.totalGenerated {
+                        totalDesignsGenerated = total
+                        UserDefaults.standard.set(total, forKey: totalGeneratedKey)
+                    }
 
                     // Track success
                     let duration = Date().timeIntervalSince(generationStartTime ?? Date())

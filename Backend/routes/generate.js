@@ -4,6 +4,7 @@ import { validateGenerateRequest, extractBase64, getMimeType } from '../utils/va
 import { readFile } from 'fs/promises';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { getOrCreateUser, updateUserGenerations } from '../db/database.js';
 
 const router = express.Router();
 
@@ -61,7 +62,32 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const { scene, style, prompt, lighting = 'day', intensity = 'medium', image_base64 } = req.body;
+    const { scene, style, prompt, lighting = 'day', intensity = 'medium', image_base64, device_id } = req.body;
+
+    // Validate device_id is provided
+    if (!device_id) {
+      console.error('❌ Missing device_id');
+      return res.status(400).json({
+        error: 'Missing device_id',
+        details: ['device_id is required for generation tracking']
+      });
+    }
+
+    // Check user's generation limit
+    console.log('📊 Checking generation limit for device:', device_id);
+    const user = await getOrCreateUser(device_id);
+
+    if (user.generations_remaining <= 0) {
+      console.warn('⚠️  User has no generations remaining');
+      return res.status(403).json({
+        error: 'No generations remaining',
+        message: 'You have used all your free designs. Share your referral code to earn more!',
+        generationsRemaining: 0,
+        totalGenerated: user.total_generated
+      });
+    }
+
+    console.log(`✅ User has ${user.generations_remaining} generations remaining`);
 
     // Extract base64 data and MIME type
     const base64Data = extractBase64(image_base64);
@@ -89,6 +115,12 @@ router.post('/', async (req, res) => {
     );
 
     console.log('✅ Image generated successfully, size:', generatedImage.imageBase64?.length || 0);
+
+    // Update user's generation count in database
+    const newGenerationsRemaining = user.generations_remaining - 1;
+    const newTotalGenerated = user.total_generated + 1;
+    await updateUserGenerations(device_id, newGenerationsRemaining, newTotalGenerated);
+    console.log(`📊 Updated user stats: ${newGenerationsRemaining} remaining, ${newTotalGenerated} total`);
 
     // Step 2: Analyze generated image for product recommendations
     let products = [];
@@ -125,6 +157,8 @@ router.post('/', async (req, res) => {
     const response = {
       decorated_image_base64: `data:${generatedImage.mimeType};base64,${generatedImage.imageBase64}`,
       products: products,
+      generationsRemaining: newGenerationsRemaining,
+      totalGenerated: newTotalGenerated,
       meta: {
         style: style,
         scene: scene,

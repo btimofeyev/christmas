@@ -39,7 +39,7 @@ class APIService {
         #if DEBUG
         return "http://localhost:3000"
         #else
-        return "https://christmas-production-18fe.up.railway.app"
+        return "https://holidayhomeai.up.railway.app"
         #endif
     }
 
@@ -70,6 +70,9 @@ class APIService {
             throw APIError.invalidResponse
         }
 
+        // Get device ID for tracking
+        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+
         // Build request
         let request = GenerateRequest(
             scene: scene,
@@ -77,7 +80,8 @@ class APIService {
             prompt: customPrompt,
             lighting: lighting,
             intensity: intensity,
-            imageBase64: imageBase64
+            imageBase64: imageBase64,
+            deviceId: deviceId
         )
 
         // Make API call

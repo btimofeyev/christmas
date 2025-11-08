@@ -10,12 +10,16 @@ import Foundation
 struct GenerateResponse: Codable {
     let decoratedImageBase64: String
     let products: [AffiliateProduct]
+    let generationsRemaining: Int?
+    let totalGenerated: Int?
     let meta: ResponseMeta?
     let note: String?
 
     enum CodingKeys: String, CodingKey {
         case decoratedImageBase64 = "decorated_image_base64"
         case products
+        case generationsRemaining
+        case totalGenerated
         case meta
         case note
     }

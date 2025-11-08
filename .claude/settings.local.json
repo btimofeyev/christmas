@@ -10,7 +10,8 @@
       "Bash(rm:*)",
       "Bash(mv:*)",
       "Bash(brew install:*)",
-      "Bash(sudo gem install:*)"
+      "Bash(sudo gem install:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
