@@ -89,6 +89,10 @@ export const getUserByDeviceId = async (deviceId) => {
   return result.rows[0] || null;
 };
 
+// Named exports for direct use
+export { pool };
+
+// Default export with all functions
 export default {
   query,
   getOrCreateUser,
