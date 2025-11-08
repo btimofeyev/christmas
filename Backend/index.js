@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import generateRouter from './routes/generate.js';
 import subscribeRouter from './routes/subscribe.js';
 import referralRouter from './routes/referral.js';
+import { pool } from './db/database.js';
 
 // Load environment variables
 dotenv.config();
@@ -110,9 +111,29 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🎄 HomeDesign AI Backend running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+
+  // Test database connection
+  console.log('\n🔍 Checking database connection...');
+  if (!process.env.DATABASE_URL) {
+    console.error('❌ DATABASE_URL environment variable is not set!');
+    console.error('   The app will fail when trying to generate images or use referrals.');
+    console.error('   Please set DATABASE_URL in Railway dashboard.');
+  } else {
+    console.log('✅ DATABASE_URL is set:', process.env.DATABASE_URL.substring(0, 30) + '...');
+    try {
+      const result = await pool.query('SELECT NOW()');
+      console.log('✅ Database connection successful!');
+      console.log(`   Connected at: ${result.rows[0].now}`);
+    } catch (error) {
+      console.error('❌ Database connection failed!');
+      console.error('   Error:', error.message);
+      console.error('   The app will not work properly.');
+    }
+  }
+  console.log('');
 });
 
 export default app;
