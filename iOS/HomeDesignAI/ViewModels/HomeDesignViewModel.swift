@@ -148,6 +148,36 @@ class HomeDesignViewModel: ObservableObject {
 
         // Load total designs generated
         totalDesignsGenerated = UserDefaults.standard.integer(forKey: totalGeneratedKey)
+
+        // Sync counts from backend on launch (backend is source of truth)
+        syncGenerationCountsFromBackend()
+    }
+
+    // MARK: - Backend Sync
+
+    /// Syncs generation counts from backend on app launch
+    private func syncGenerationCountsFromBackend() {
+        Task {
+            do {
+                // Get or create user to sync counts
+                let user = try await apiService.getOrCreateUser(deviceId: deviceId)
+
+                // Update local state with backend counts
+                self.generationsRemaining = user.generationsRemaining
+                self.totalDesignsGenerated = user.totalGenerated
+                saveGenerationCount()
+                UserDefaults.standard.set(user.totalGenerated, forKey: totalGeneratedKey)
+
+                #if DEBUG
+                print("✅ Synced generation counts from backend: \(user.generationsRemaining) remaining, \(user.totalGenerated) total")
+                #endif
+            } catch {
+                #if DEBUG
+                print("⚠️ Failed to sync generation counts from backend: \(error.localizedDescription)")
+                #endif
+                // Fail silently - use local counts as fallback
+            }
+        }
     }
 
     // MARK: - Navigation
@@ -159,6 +189,17 @@ class HomeDesignViewModel: ObservableObject {
     }
 
     func reset() {
+        // Check if user has generations remaining before allowing new design
+        if generationsRemaining <= 0 {
+            // Show referral prompt to earn more generations
+            showReferralPrompt = true
+            analytics.track(event: .noGenerationsRemaining)
+
+            // Haptic feedback to indicate limit reached
+            HapticFeedback.error()
+            return
+        }
+
         withAnimation(AppAnimation.standard) {
             currentStep = .uploadPhoto  // Start at upload, not welcome
             selectedImage = nil
@@ -179,6 +220,17 @@ class HomeDesignViewModel: ObservableObject {
     // MARK: - Image Selection
 
     func selectImageSource(_ sourceType: UIImagePickerController.SourceType) {
+        // Check if user has generations remaining before allowing upload
+        if generationsRemaining <= 0 {
+            // Show referral prompt to earn more generations
+            showReferralPrompt = true
+            analytics.track(event: .noGenerationsRemaining)
+
+            // Haptic feedback to indicate limit reached
+            HapticFeedback.error()
+            return
+        }
+
         imagePickerSourceType = sourceType
         showImagePicker = true
         analytics.track(event: .uploadPhotoTapped)
@@ -188,6 +240,17 @@ class HomeDesignViewModel: ObservableObject {
         selectedImage = image
         showImagePicker = false
         analytics.track(event: .photoSelected)
+
+        // Check if user has generations remaining (in case it changed since picker opened)
+        if generationsRemaining <= 0 {
+            // Show referral prompt to earn more generations
+            showReferralPrompt = true
+            analytics.track(event: .noGenerationsRemaining)
+
+            // Haptic feedback to indicate limit reached
+            HapticFeedback.error()
+            return
+        }
 
         // Haptic feedback for successful photo selection
         HapticFeedback.success()
@@ -314,9 +377,27 @@ class HomeDesignViewModel: ObservableObject {
                 analytics.track(event: .generateCompleted(success: false, duration: duration))
                 analytics.track(event: .errorOccurred(error: error.localizedDescription))
 
-                // Restore generation count since API failed
-                generationsRemaining += 1
-                saveGenerationCount()
+                // Check if error contains updated generation counts from backend
+                if let apiError = error as? APIError {
+                    // Sync from backend if available (backend is source of truth)
+                    if let remaining = apiError.generationsRemaining {
+                        generationsRemaining = remaining
+                        saveGenerationCount()
+                    } else {
+                        // No backend count, restore the optimistically decremented count
+                        generationsRemaining += 1
+                        saveGenerationCount()
+                    }
+
+                    if let total = apiError.totalGenerated {
+                        totalDesignsGenerated = total
+                        UserDefaults.standard.set(total, forKey: totalGeneratedKey)
+                    }
+                } else {
+                    // Unknown error type, restore count
+                    generationsRemaining += 1
+                    saveGenerationCount()
+                }
 
                 // Haptic feedback for error
                 HapticFeedback.error()

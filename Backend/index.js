@@ -1,15 +1,16 @@
+// Load environment variables FIRST (before any imports that need them)
+import dotenv from 'dotenv';
+dotenv.config();
+
+// Now import everything else
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import generateRouter from './routes/generate.js';
 import subscribeRouter from './routes/subscribe.js';
 import referralRouter from './routes/referral.js';
 import { pool } from './db/database.js';
-
-// Load environment variables
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -129,7 +130,9 @@ app.listen(PORT, async () => {
       console.log(`   Connected at: ${result.rows[0].now}`);
     } catch (error) {
       console.error('❌ Database connection failed!');
-      console.error('   Error:', error.message);
+      console.error('   Error message:', error.message || 'No error message');
+      console.error('   Error code:', error.code);
+      console.error('   Full error:', error);
       console.error('   The app will not work properly.');
     }
   }

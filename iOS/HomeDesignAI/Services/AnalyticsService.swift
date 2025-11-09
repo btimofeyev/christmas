@@ -25,6 +25,7 @@ enum AnalyticsEvent {
     case referralCodeGenerated
     case sharedToUnlock
     case referralClaimed(code: String)
+    case noGenerationsRemaining
     case videoCreated
     case videoShared
     case errorOccurred(error: String)
@@ -45,6 +46,7 @@ enum AnalyticsEvent {
         case .referralCodeGenerated: return "referral_code_generated"
         case .sharedToUnlock: return "shared_to_unlock"
         case .referralClaimed: return "referral_claimed"
+        case .noGenerationsRemaining: return "no_generations_remaining"
         case .videoCreated: return "video_created"
         case .videoShared: return "video_shared"
         case .errorOccurred: return "error_occurred"

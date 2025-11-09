@@ -70,6 +70,9 @@ struct ContentView: View {
         } message: {
             Text(viewModel.referralRewardMessage)
         }
+        .sheet(isPresented: $viewModel.showReferralPrompt) {
+            NoGenerationsView(viewModel: viewModel)
+        }
         .onOpenURL { url in
             handleDeepLink(url: url)
         }

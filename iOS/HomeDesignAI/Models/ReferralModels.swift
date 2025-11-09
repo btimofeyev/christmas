@@ -28,3 +28,11 @@ struct ReferralReward: Codable {
     let claimer: Int    // Generations awarded to new user
     let referrer: Int   // Generations awarded to referrer
 }
+
+// MARK: - User Data Response
+
+struct UserDataResponse: Codable {
+    let generationsRemaining: Int
+    let totalGenerated: Int
+    let deviceId: String
+}

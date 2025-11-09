@@ -225,6 +225,35 @@ router.get('/referral-stats/:code', async (req, res) => {
   }
 });
 
+// GET /user/:deviceId
+// Get or create user and return current generation counts
+router.get('/user/:deviceId', async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+
+    if (!deviceId) {
+      return res.status(400).json({
+        error: 'Device ID is required'
+      });
+    }
+
+    // Get or create user
+    const user = await getOrCreateUser(deviceId);
+
+    res.json({
+      generationsRemaining: user.generations_remaining,
+      totalGenerated: user.total_generated,
+      deviceId: user.device_id
+    });
+
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({
+      error: 'Failed to fetch user data'
+    });
+  }
+});
+
 // GET /stats/:deviceId
 // Get user's referral stats by device ID
 router.get('/stats/:deviceId', async (req, res) => {

@@ -1,11 +1,23 @@
 import pkg from 'pg';
 const { Pool } = pkg;
+import dotenv from 'dotenv';
+
+// Load environment variables (needed for local development)
+dotenv.config();
+
+// Debug: Check if DATABASE_URL is loaded
+if (process.env.DATABASE_URL) {
+  console.log('🔧 Database module: DATABASE_URL loaded successfully');
+} else {
+  console.log('⚠️  Database module: DATABASE_URL is NOT set!');
+}
 
 // Initialize connection pool
 // DATABASE_URL is automatically injected by Railway
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? {
+  // Railway Postgres requires SSL even for external connections
+  ssl: process.env.DATABASE_URL ? {
     rejectUnauthorized: false
   } : false
 });

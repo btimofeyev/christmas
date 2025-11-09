@@ -13,7 +13,7 @@ enum APIError: Error {
     case networkError(Error)
     case invalidResponse
     case decodingError(Error)
-    case serverError(String)
+    case serverError(String, generationsRemaining: Int? = nil, totalGenerated: Int? = nil)
 
     var localizedDescription: String {
         switch self {
@@ -25,8 +25,26 @@ enum APIError: Error {
             return "Invalid response from server"
         case .decodingError(let error):
             return "Failed to decode response: \(error.localizedDescription)"
-        case .serverError(let message):
+        case .serverError(let message, _, _):
             return "Server error: \(message)"
+        }
+    }
+
+    var generationsRemaining: Int? {
+        switch self {
+        case .serverError(_, let remaining, _):
+            return remaining
+        default:
+            return nil
+        }
+    }
+
+    var totalGenerated: Int? {
+        switch self {
+        case .serverError(_, _, let total):
+            return total
+        default:
+            return nil
         }
     }
 }
@@ -112,7 +130,11 @@ class APIService {
             // Check for server errors
             if httpResponse.statusCode != 200 {
                 if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
-                    throw APIError.serverError(errorResponse.message ?? "Unknown error")
+                    throw APIError.serverError(
+                        errorResponse.message ?? "Unknown error",
+                        generationsRemaining: errorResponse.generationsRemaining,
+                        totalGenerated: errorResponse.totalGenerated
+                    )
                 }
                 throw APIError.serverError("HTTP \(httpResponse.statusCode)")
             }
@@ -247,6 +269,44 @@ class APIService {
             throw APIError.networkError(error)
         }
     }
+
+    /// Gets or creates user and returns current generation counts
+    /// - Parameter deviceId: Unique device identifier
+    /// - Returns: UserDataResponse with current generation counts
+    func getOrCreateUser(deviceId: String) async throws -> UserDataResponse {
+        guard let url = URL(string: "\(baseURL)/referral/user/\(deviceId)") else {
+            throw APIError.invalidURL
+        }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        urlRequest.timeoutInterval = 30
+
+        // Perform request
+        do {
+            let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw APIError.invalidResponse
+            }
+
+            if httpResponse.statusCode != 200 {
+                if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                    throw APIError.serverError(errorResponse.error)
+                }
+                throw APIError.serverError("HTTP \(httpResponse.statusCode)")
+            }
+
+            let decoder = JSONDecoder()
+            let userDataResponse = try decoder.decode(UserDataResponse.self, from: data)
+            return userDataResponse
+
+        } catch let error as APIError {
+            throw error
+        } catch {
+            throw APIError.networkError(error)
+        }
+    }
 }
 
 // MARK: - Helper Models
@@ -255,4 +315,6 @@ private struct ErrorResponse: Codable {
     let error: String
     let message: String?
     let details: [String]?
+    let generationsRemaining: Int?
+    let totalGenerated: Int?
 }
