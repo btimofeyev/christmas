@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import generateRouter from './routes/generate.js';
 import subscribeRouter from './routes/subscribe.js';
 import referralRouter from './routes/referral.js';
+import contactRouter from './routes/contact.js';
 import { pool } from './db/database.js';
 
 const app = express();
@@ -86,6 +87,7 @@ app.get('/health', (req, res) => {
 app.use('/generate', generateRouter);
 app.use('/subscribe', subscribeRouter);
 app.use('/referral', referralRouter);
+app.use('/contact', contactRouter);
 
 // Referral landing page route
 app.get('/r/:code', (req, res) => {
@@ -100,6 +102,10 @@ app.get('/privacy', (req, res) => {
 
 app.get('/terms', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/terms.html'));
+});
+
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/contact.html'));
 });
 
 // Serve static files from public directory (fallback - comes AFTER API routes)
