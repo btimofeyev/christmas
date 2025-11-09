@@ -15,7 +15,6 @@ enum DecorStyle: String, Codable, CaseIterable {
     case cozyFamily = "cozy_family"
     case rusticFarmhouse = "rustic_farmhouse"
     case elegantGold = "elegant_gold"
-    case colorfulWhimsical = "colorful_whimsical"
     case custom
 
     var displayName: String {
@@ -32,8 +31,6 @@ enum DecorStyle: String, Codable, CaseIterable {
             return "Rustic Farmhouse"
         case .elegantGold:
             return "Elegant Gold"
-        case .colorfulWhimsical:
-            return "Colorful Whimsical"
         case .custom:
             return "Custom Style"
         }
@@ -53,8 +50,6 @@ enum DecorStyle: String, Codable, CaseIterable {
             return "Country charm with burlap, wood, and vintage lanterns"
         case .elegantGold:
             return "Luxurious gold and cream tones, sophisticated and refined"
-        case .colorfulWhimsical:
-            return "Vibrant rainbow colors, playful and joyful decorations"
         case .custom:
             return "Describe your own unique style"
         }
@@ -74,8 +69,6 @@ enum DecorStyle: String, Codable, CaseIterable {
             return "house.fill"
         case .elegantGold:
             return "crown.fill"
-        case .colorfulWhimsical:
-            return "sparkles"
         case .custom:
             return "wand.and.stars"
         }
@@ -95,8 +88,6 @@ enum DecorStyle: String, Codable, CaseIterable {
             return Color(red: 0.6, green: 0.4, blue: 0.2) // Brown
         case .elegantGold:
             return Color(red: 0.83, green: 0.69, blue: 0.22) // Gold
-        case .colorfulWhimsical:
-            return Color(red: 1.0, green: 0.4, blue: 0.7) // Pink
         case .custom:
             return Color(red: 0.5, green: 0.5, blue: 0.5) // Gray
         }
@@ -104,7 +95,7 @@ enum DecorStyle: String, Codable, CaseIterable {
 
     // Get all preset styles (excluding custom)
     static var presets: [DecorStyle] {
-        return [.classicChristmas, .nordicMinimalist, .modernSilver, .cozyFamily, .rusticFarmhouse, .elegantGold, .colorfulWhimsical]
+        return [.classicChristmas, .nordicMinimalist, .modernSilver, .cozyFamily, .rusticFarmhouse, .elegantGold]
     }
 }
 

@@ -10,13 +10,13 @@ import SwiftUI
 struct StyleSelectionView: View {
     @ObservedObject var viewModel: HomeDesignViewModel
     @State private var customPromptText = ""
+    @State private var showCustomSheet = false
     @FocusState private var isPromptFocused: Bool
 
     private let styleRows: [[DecorStyle]] = [
         [.classicChristmas, .nordicMinimalist],
         [.modernSilver, .cozyFamily],
-        [.rusticFarmhouse, .elegantGold],
-        [.colorfulWhimsical]
+        [.rusticFarmhouse, .elegantGold]
     ]
 
     var body: some View {
@@ -63,13 +63,6 @@ struct StyleSelectionView: View {
                     }
                 }
 
-                    CustomStyleCard(
-                        prompt: $customPromptText,
-                        isFocused: _isPromptFocused
-                    ) {
-                        viewModel.selectCustomStyle(prompt: customPromptText)
-                    }
-
                     Button(action: {
                         viewModel.goToStep(.sceneSelection)
                     }) {
@@ -84,6 +77,41 @@ struct StyleSelectionView: View {
                 }
                 .padding(.horizontal, AppSpacing.xl)
             }
+
+            // Floating Custom Style Button
+            VStack {
+                Spacer()
+                Button(action: {
+                    showCustomSheet = true
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "wand.and.stars")
+                            .font(.system(size: 18, weight: .semibold))
+                        Text("Custom Style")
+                            .font(AppFonts.callout)
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(AppColors.primary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, AppSpacing.md)
+                    .background(AppColors.surface)
+                    .cornerRadius(AppCornerRadius.lg)
+                    .shadow(color: AppColors.deepShadow.opacity(0.3), radius: 16, x: 0, y: 8)
+                }
+                .padding(.horizontal, AppSpacing.xl)
+                .padding(.bottom, AppSpacing.lg)
+                .pressAnimation()
+            }
+        }
+        .sheet(isPresented: $showCustomSheet) {
+            CustomStyleSheet(
+                prompt: $customPromptText,
+                isFocused: _isPromptFocused,
+                onSubmit: {
+                    viewModel.selectCustomStyle(prompt: customPromptText)
+                    showCustomSheet = false
+                }
+            )
         }
         .onChange(of: viewModel.selectedStyle) { newValue in
             if newValue != .custom {
@@ -129,11 +157,11 @@ private struct StyleChoiceCard: View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: AppSpacing.sm) {
                 Image(systemName: style.icon)
-                    .font(.system(size: 26))
+                    .font(.system(size: 24))
                     .foregroundColor(AppColors.primary)
-                    .padding(12)
+                    .padding(10)
                     .background(AppColors.surface)
-                    .cornerRadius(16)
+                    .cornerRadius(14)
                     .shadow(color: AppColors.deepShadow.opacity(0.12), radius: 8, x: 0, y: 6)
 
                 Text(style.displayName)
@@ -143,9 +171,10 @@ private struct StyleChoiceCard: View {
                 Text(style.description)
                     .font(AppFonts.caption)
                     .foregroundColor(Color.white.opacity(0.75))
+                    .lineLimit(2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(AppSpacing.md)
+            .padding(14)
             .background(isSelected ? AppColors.surface.opacity(0.25) : AppColors.surface.opacity(0.12))
             .cornerRadius(AppCornerRadius.lg)
             .overlay(
@@ -221,51 +250,81 @@ private struct IntensitySelectionRow: View {
     }
 }
 
-private struct CustomStyleCard: View {
+private struct CustomStyleSheet: View {
     @Binding var prompt: String
     @FocusState var isFocused: Bool
     let onSubmit: () -> Void
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.sm) {
-            HStack {
-                Image(systemName: "wand.and.stars")
-                    .foregroundColor(AppColors.primary)
-                Text("Describe your own style")
-                    .font(AppFonts.headline)
+        NavigationView {
+            ZStack {
+                AppGradients.twilight
+                    .ignoresSafeArea()
+
+                VStack(spacing: AppSpacing.lg) {
+                    VStack(spacing: AppSpacing.xs) {
+                        Image(systemName: "wand.and.stars")
+                            .font(.system(size: 48))
+                            .foregroundColor(AppColors.primary)
+                            .padding(.top, AppSpacing.xl)
+
+                        Text("Custom Style")
+                            .font(AppFonts.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+
+                        Text("Describe the festive look you envision")
+                            .font(AppFonts.callout)
+                            .foregroundColor(Color.white.opacity(0.85))
+                            .multilineTextAlignment(.center)
+                    }
+
+                    VStack(spacing: AppSpacing.md) {
+                        TextField("e.g. Cozy cabin with twinkling fairy lights and woodland creatures", text: $prompt)
+                            .focused($isFocused)
+                            .submitLabel(.done)
+                            .onSubmit {
+                                if !prompt.isEmpty {
+                                    onSubmit()
+                                }
+                            }
+                            .padding()
+                            .background(AppColors.surface)
+                            .cornerRadius(AppCornerRadius.md)
+                            .foregroundColor(AppColors.primary)
+
+                        Button(action: {
+                            onSubmit()
+                        }) {
+                            Text("Design My Custom Look")
+                                .font(AppFonts.callout)
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppColors.primary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, AppSpacing.md)
+                                .background(AppColors.surface)
+                                .cornerRadius(AppCornerRadius.md)
+                                .opacity(prompt.isNotEmpty ? 1 : 0.4)
+                                .shadow(color: AppColors.deepShadow.opacity(0.2), radius: 12, x: 0, y: 6)
+                        }
+                        .disabled(prompt.isEmpty)
+                        .pressAnimation()
+                    }
+
+                    Spacer()
+                }
+                .padding(.horizontal, AppSpacing.xl)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
                     .foregroundColor(.white)
+                }
             }
-
-            TextField("e.g. Cozy cabin with twinkling fairy lights", text: $prompt)
-                .focused($isFocused)
-                .submitLabel(.done)
-                .padding()
-                .background(AppColors.surface)
-                .cornerRadius(AppCornerRadius.md)
-
-            Button(action: {
-                onSubmit()
-            }) {
-                Text("Design My Custom Look")
-                    .font(AppFonts.callout)
-                    .fontWeight(.semibold)
-                    .foregroundColor(AppColors.primary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppSpacing.md)
-                    .background(AppColors.surface)
-                    .cornerRadius(AppCornerRadius.md)
-                    .opacity(prompt.isNotEmpty ? 1 : 0.4)
-            }
-            .disabled(prompt.isEmpty)
-            .pressAnimation()
+            .navigationBarTitleDisplayMode(.inline)
         }
-        .padding(AppSpacing.md)
-        .background(AppColors.surface.opacity(0.18))
-        .cornerRadius(AppCornerRadius.lg)
-        .overlay(
-            RoundedRectangle(cornerRadius: AppCornerRadius.lg)
-                .stroke(Color.white.opacity(0.25), lineWidth: 1)
-        )
-        .shadow(color: AppColors.deepShadow.opacity(0.2), radius: 14, x: 0, y: 8)
     }
 }

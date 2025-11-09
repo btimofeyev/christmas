@@ -20,7 +20,7 @@ const __dirname = dirname(__filename);
  * Request body:
  * {
  *   "scene": "interior" | "exterior",
- *   "style": "classic_christmas" | "nordic_minimalist" | "modern_silver" | "cozy_family" | "rustic_farmhouse" | "elegant_gold" | "colorful_whimsical" | "custom",
+ *   "style": "classic_christmas" | "nordic_minimalist" | "modern_silver" | "cozy_family" | "rustic_farmhouse" | "elegant_gold" | "custom",
  *   "prompt": "custom decoration description" (required if style is "custom"),
  *   "lighting": "day" | "night",
  *   "intensity": "minimal" | "light" | "medium" | "heavy" | "maximal" (optional, defaults to "medium"),

@@ -13,8 +13,8 @@ export function validateGenerateRequest(body) {
 
   if (!body.style) {
     errors.push('style is required');
-  } else if (!['classic_christmas', 'nordic_minimalist', 'modern_silver', 'cozy_family', 'rustic_farmhouse', 'elegant_gold', 'colorful_whimsical', 'custom'].includes(body.style)) {
-    errors.push('Invalid style. Must be one of: classic_christmas, nordic_minimalist, modern_silver, cozy_family, rustic_farmhouse, elegant_gold, colorful_whimsical, custom');
+  } else if (!['classic_christmas', 'nordic_minimalist', 'modern_silver', 'cozy_family', 'rustic_farmhouse', 'elegant_gold', 'custom'].includes(body.style)) {
+    errors.push('Invalid style. Must be one of: classic_christmas, nordic_minimalist, modern_silver, cozy_family, rustic_farmhouse, elegant_gold, custom');
   }
 
   if (body.style === 'custom' && !body.prompt) {
