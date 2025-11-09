@@ -93,6 +93,15 @@ app.get('/r/:code', (req, res) => {
   res.sendFile(path.join(__dirname, '../public/r.html'));
 });
 
+// Explicit routes for legal pages
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/privacy.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/terms.html'));
+});
+
 // Serve static files from public directory (fallback - comes AFTER API routes)
 const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
