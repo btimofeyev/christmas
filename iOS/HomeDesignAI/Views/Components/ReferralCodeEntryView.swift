@@ -13,76 +13,81 @@ struct ReferralCodeEntryView: View {
 
     var body: some View {
         NavigationView {
-            VStack(spacing: 30) {
-                // Header
-                VStack(spacing: 12) {
-                    Text("🎁")
-                        .font(.system(size: 60))
+            ZStack {
+                AppGradients.twilight
+                    .ignoresSafeArea()
 
-                    Text("Enter Referral Code")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
+                VStack(spacing: AppSpacing.lg) {
+                    VStack(spacing: AppSpacing.xs) {
+                        Image(systemName: "gift.fill")
+                            .font(.system(size: 48))
+                            .foregroundColor(AppColors.primary)
+                            .padding(.top, AppSpacing.xl)
 
-                    Text("Get 3 free designs when you enter a valid referral code!")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                }
+                        Text("Enter Referral Code")
+                            .font(AppFonts.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
 
-                // Code Input
-                VStack(spacing: 16) {
-                    Text("Referral Code")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-
-                    TextField("Enter 6-character code", text: $viewModel.referralCodeInput)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .textCase(.uppercase)
-                        .keyboardType(.asciiCapable)
-                        .autocorrectionDisabled()
-                        .textInputAutocapitalization(.characters)
-                        .font(.title2)
-                        .fontWeight(.medium)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                }
-
-                Spacer()
-
-                // Action Buttons
-                VStack(spacing: 12) {
-                    Button(action: {
-                        viewModel.enterReferralCodeManually(code: viewModel.referralCodeInput)
-                        dismiss()
-                    }) {
-                        HStack {
-                            if viewModel.isClaimingReferral {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                    .scaleEffect(0.8)
-                            }
-
-                            Text(viewModel.isClaimingReferral ? "Claiming..." : "Claim Code")
-                                .fontWeight(.semibold)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(viewModel.referralCodeInput.isEmpty ? Color.gray : Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                        Text("Get 3 free designs when you enter a valid referral code!")
+                            .font(AppFonts.callout)
+                            .foregroundColor(Color.white.opacity(0.85))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, AppSpacing.md)
                     }
-                    .disabled(viewModel.referralCodeInput.isEmpty || viewModel.isClaimingReferral)
 
+                    VStack(spacing: AppSpacing.md) {
+                        TextField("Enter 6-character code", text: $viewModel.referralCodeInput)
+                            .textCase(.uppercase)
+                            .keyboardType(.asciiCapable)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.characters)
+                            .font(.system(size: 24, weight: .semibold))
+                            .multilineTextAlignment(.center)
+                            .padding()
+                            .background(AppColors.surface)
+                            .cornerRadius(AppCornerRadius.md)
+                            .foregroundColor(AppColors.primary)
+
+                        Button(action: {
+                            viewModel.enterReferralCodeManually(code: viewModel.referralCodeInput)
+                            dismiss()
+                        }) {
+                            HStack {
+                                if viewModel.isClaimingReferral {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle(tint: AppColors.primary))
+                                        .scaleEffect(0.8)
+                                }
+
+                                Text(viewModel.isClaimingReferral ? "Claiming..." : "Claim Rewards")
+                                    .font(AppFonts.callout)
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(AppColors.primary)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, AppSpacing.md)
+                            .background(AppColors.surface)
+                            .cornerRadius(AppCornerRadius.md)
+                            .opacity(viewModel.referralCodeInput.isEmpty ? 0.4 : 1)
+                            .shadow(color: AppColors.deepShadow.opacity(0.2), radius: 12, x: 0, y: 6)
+                        }
+                        .disabled(viewModel.referralCodeInput.isEmpty || viewModel.isClaimingReferral)
+                    }
+
+                    Spacer()
+                }
+                .padding(.horizontal, AppSpacing.xl)
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.white)
                 }
             }
-            .padding(30)
-            .background(Color(.systemGroupedBackground))
-            .navigationBarHidden(true)
+            .navigationBarTitleDisplayMode(.inline)
         }
         .alert("Error", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) { }

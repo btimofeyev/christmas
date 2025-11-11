@@ -83,15 +83,15 @@ struct ContentView: View {
                     viewModel.showReferralCodeEntry = true
                 }) {
                     Image(systemName: "gift.fill")
-                        .font(.title2)
+                        .font(.callout)
                         .foregroundColor(.white)
-                        .padding(12)
-                        .background(Color.red)
+                        .padding(8)
+                        .background(Color.white.opacity(0.25))
                         .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        .shadow(color: .black.opacity(0.15), radius: 3, x: 0, y: 1)
                 }
-                .padding(.trailing, 20)
-                .padding(.top, 60) // Adjust for safe area
+                .padding(.trailing, 16)
+                .padding(.top, 50)
             }
         }
         .onOpenURL { url in
