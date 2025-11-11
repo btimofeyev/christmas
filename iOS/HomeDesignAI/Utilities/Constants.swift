@@ -99,7 +99,7 @@ enum AppConfig {
 
     // Referral system
     static let referralBaseUrl = "https://holidayhomeai.up.railway.app/r/"
-    static let appStoreUrl = "https://apps.apple.com/app/holidayhome-ai/id123456789" // TODO: Update with real App Store URL
+    static let appStoreUrl = "https://apps.apple.com/us/app/holidayhomeai/id6755014951" // Updated with real App Store URL
 }
 
 // MARK: - Animation (2025 Apple Design - Spring Physics)
