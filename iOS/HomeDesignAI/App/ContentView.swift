@@ -73,6 +73,27 @@ struct ContentView: View {
         .sheet(isPresented: $viewModel.showReferralPrompt) {
             NoGenerationsView(viewModel: viewModel)
         }
+        .sheet(isPresented: $viewModel.showReferralCodeEntry) {
+            ReferralCodeEntryView(viewModel: viewModel)
+        }
+        .overlay(alignment: .topTrailing) {
+            // Show present button on main screens (not generating)
+            if viewModel.currentStep != .generating {
+                Button(action: {
+                    viewModel.showReferralCodeEntry = true
+                }) {
+                    Image(systemName: "gift.fill")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .padding(12)
+                        .background(Color.red)
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                }
+                .padding(.trailing, 20)
+                .padding(.top, 60) // Adjust for safe area
+            }
+        }
         .onOpenURL { url in
             handleDeepLink(url: url)
         }

@@ -136,7 +136,7 @@
                 <span class="benefit-icon">🎁</span>
                 <div>
                     <strong>You get +3 free designs</strong><br>
-                    <small>Instant bonus when you join</small>
+                    <small>Tap the 🎁 button in the app and enter this code</small>
                 </div>
             </div>
             <div class="benefit">
@@ -167,40 +167,20 @@
         const urlParams = new URLSearchParams(window.location.search);
         const referralCode = urlParams.get('code') || window.location.pathname.split('/').pop() || 'WELCOME';
 
-        // Display referral code
+        // Display referral code prominently
         document.getElementById('referral-code').textContent = referralCode;
 
-        // App Store URL (Updated with real App Store URL)
+        // App Store URL
         const appStoreUrl = 'https://apps.apple.com/us/app/holidayhomeai/id6755014951';
-
-        // Deep link URL scheme
-        const deepLinkUrl = `holidayhomeai://r/${referralCode}`;
 
         // Update download button
         document.getElementById('download-button').href = appStoreUrl;
 
-        // Attempt to open app via deep link
-        function attemptDeepLink() {
-            // Try to open the app
-            window.location.href = deepLinkUrl;
+        // Hide loading message immediately since we're not using deep links
+        document.getElementById('loading').style.display = 'none';
 
-            // If app doesn't open in 2 seconds, assume it's not installed
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-            }, 2000);
-        }
-
-        // Attempt deep link on page load
-        if (referralCode && referralCode !== 'r.html') {
-            attemptDeepLink();
-        } else {
-            document.getElementById('loading').style.display = 'none';
-        }
-
-        // Also attempt on button click
-        document.getElementById('download-button').addEventListener('click', (e) => {
-            attemptDeepLink();
-        });
+        // Make download button visible
+        document.getElementById('download-button').style.display = 'inline-block';
     </script>
 </body>
 </html>

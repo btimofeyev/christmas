@@ -50,6 +50,11 @@ class HomeDesignViewModel: ObservableObject {
     @Published var referralRewardMessage: String = ""
     @Published var showReferralReward = false
 
+    // Manual Referral Code Entry
+    @Published var showReferralCodeEntry = false
+    @Published var referralCodeInput: String = ""
+    @Published var isClaimingReferral = false
+
     // Generation Limits
     @Published var generationsRemaining: Int = AppConfig.initialFreeGenerations
     @Published var totalDesignsGenerated: Int = 0
@@ -631,6 +636,67 @@ class HomeDesignViewModel: ObservableObject {
                 #endif
                 // Fail silently - might be invalid/expired code
             }
+        }
+    }
+
+    /// Manual referral code entry from present button
+    func enterReferralCodeManually(code: String) {
+        // Clean the input code
+        let cleanCode = code.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+
+        // Validate code format
+        guard cleanCode.count == 6 else {
+            errorMessage = "Please enter a valid 6-character referral code"
+            showError = true
+            return
+        }
+
+        // Check if already claimed this code
+        let claimedCodes = UserDefaults.standard.stringArray(forKey: claimedReferralCodesKey) ?? []
+        if claimedCodes.contains(cleanCode) {
+            errorMessage = "You've already used this referral code"
+            showError = true
+            return
+        }
+
+        Task {
+            do {
+                isClaimingReferral = true
+
+                let response = try await apiService.claimReferral(code: cleanCode, deviceId: deviceId)
+
+                // Award generations to current user
+                self.generationsRemaining += response.reward.claimer
+                saveGenerationCount()
+
+                // Mark code as claimed
+                var updatedClaimedCodes = claimedCodes
+                updatedClaimedCodes.append(cleanCode)
+                UserDefaults.standard.set(updatedClaimedCodes, forKey: claimedReferralCodesKey)
+
+                // Show success message
+                self.referralRewardMessage = "Success! You earned \(response.reward.claimer) free designs! 🎁"
+                self.showReferralReward = true
+
+                // Track event
+                analytics.track(event: .referralClaimed(code: cleanCode))
+
+                // Haptic feedback
+                HapticFeedback.success()
+
+                // Reset input
+                self.referralCodeInput = ""
+                self.showReferralCodeEntry = false
+
+            } catch {
+                #if DEBUG
+                print("Failed to claim referral: \(error)")
+                #endif
+                errorMessage = "Invalid or expired referral code"
+                showError = true
+            }
+
+            isClaimingReferral = false
         }
     }
 
