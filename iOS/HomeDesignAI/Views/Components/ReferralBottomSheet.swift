@@ -11,6 +11,7 @@ struct ReferralBottomSheet: View {
     @ObservedObject var viewModel: HomeDesignViewModel
     @Environment(\.dismiss) var dismiss
     @State private var showShareSheet = false
+    @State private var codeCopied = false
 
     var body: some View {
         NavigationView {
@@ -72,13 +73,43 @@ struct ReferralBottomSheet: View {
                             .font(AppFonts.caption)
                             .foregroundColor(AppColors.text.opacity(0.6))
 
-                        Text(code)
-                            .font(.system(.title3, design: .monospaced))
-                            .fontWeight(.bold)
-                            .foregroundColor(AppColors.primary)
-                            .padding(AppSpacing.sm)
+                        Button(action: {
+                            UIPasteboard.general.string = code
+                            codeCopied = true
+
+                            // Haptic feedback
+                            let generator = UIImpactFeedbackGenerator(style: .medium)
+                            generator.impactOccurred()
+
+                            // Reset after 2 seconds
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                codeCopied = false
+                            }
+                        }) {
+                            HStack(spacing: AppSpacing.xs) {
+                                Text(code)
+                                    .font(.system(.title3, design: .monospaced))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(AppColors.primary)
+
+                                Image(systemName: codeCopied ? "checkmark.circle.fill" : "doc.on.doc.fill")
+                                    .font(.system(size: 16))
+                                    .foregroundColor(codeCopied ? .green : AppColors.primary.opacity(0.6))
+                            }
+                            .padding(AppSpacing.md)
+                            .frame(maxWidth: .infinity)
                             .background(AppColors.surface)
-                            .cornerRadius(AppCornerRadius.sm)
+                            .cornerRadius(AppCornerRadius.md)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: AppCornerRadius.md)
+                                    .stroke(codeCopied ? Color.green.opacity(0.5) : AppColors.primary.opacity(0.2), lineWidth: 2)
+                            )
+                        }
+
+                        Text(codeCopied ? "Copied!" : "Tap to copy")
+                            .font(AppFonts.caption)
+                            .foregroundColor(codeCopied ? .green : AppColors.text.opacity(0.5))
+                            .animation(.easeInOut(duration: 0.2), value: codeCopied)
                     }
                     .padding(.top, AppSpacing.sm)
                 }

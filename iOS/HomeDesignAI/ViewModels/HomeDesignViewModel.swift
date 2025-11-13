@@ -625,6 +625,11 @@ class HomeDesignViewModel: ObservableObject {
                 // Haptic feedback
                 HapticFeedback.success()
 
+                // Request review after successful referral claim
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    ReviewRequestManager.shared.requestReviewIfAppropriate(event: .referralClaimed)
+                }
+
                 // Auto-dismiss after 3 seconds
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     self.showReferralReward = false
@@ -683,6 +688,11 @@ class HomeDesignViewModel: ObservableObject {
 
                 // Haptic feedback
                 HapticFeedback.success()
+
+                // Request review after successful manual referral entry
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    ReviewRequestManager.shared.requestReviewIfAppropriate(event: .manualReferralEntry)
+                }
 
                 // Reset input
                 self.referralCodeInput = ""

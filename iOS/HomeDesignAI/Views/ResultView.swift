@@ -266,6 +266,14 @@ struct ResultView: View {
                     }
                 }
             }
+
+            // Request review at milestone generations (3rd, 5th)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                ReviewRequestManager.shared.requestReviewIfAppropriate(
+                    event: .successfulGeneration,
+                    generationCount: viewModel.totalDesignsGenerated
+                )
+            }
         }
     }
 

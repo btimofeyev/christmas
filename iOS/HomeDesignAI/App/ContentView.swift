@@ -11,6 +11,8 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var viewModel = HomeDesignViewModel()
     @Namespace private var heroNamespace
+    @State private var showReferralMenu = false
+    @State private var showMyReferralCode = false
 
     var body: some View {
         ZStack {
@@ -80,7 +82,7 @@ struct ContentView: View {
             // Show present button on main screens (not generating)
             if viewModel.currentStep != .generating {
                 Button(action: {
-                    viewModel.showReferralCodeEntry = true
+                    showReferralMenu = true
                 }) {
                     Image(systemName: "gift.fill")
                         .font(.callout)
@@ -93,6 +95,24 @@ struct ContentView: View {
                 .padding(.trailing, 16)
                 .padding(.top, 50)
             }
+        }
+        .sheet(isPresented: $showReferralMenu) {
+            ReferralMenuView(
+                viewModel: viewModel,
+                onEnterCode: {
+                    showReferralMenu = false
+                    viewModel.showReferralCodeEntry = true
+                },
+                onShareCode: {
+                    showReferralMenu = false
+                    viewModel.generateOrGetReferralCode()
+                    showMyReferralCode = true
+                }
+            )
+            .presentationDetents([.height(400)])
+        }
+        .sheet(isPresented: $showMyReferralCode) {
+            ReferralBottomSheet(viewModel: viewModel)
         }
         .onOpenURL { url in
             handleDeepLink(url: url)

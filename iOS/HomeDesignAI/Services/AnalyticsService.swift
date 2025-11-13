@@ -28,6 +28,9 @@ enum AnalyticsEvent {
     case noGenerationsRemaining
     case videoCreated
     case videoShared
+    case reviewPromptShown(trigger: String)
+    case reviewPromptEligible(trigger: String, generationCount: Int)
+    case reviewPromptBlocked(trigger: String, reason: String)
     case errorOccurred(error: String)
 
     var name: String {
@@ -49,6 +52,9 @@ enum AnalyticsEvent {
         case .noGenerationsRemaining: return "no_generations_remaining"
         case .videoCreated: return "video_created"
         case .videoShared: return "video_shared"
+        case .reviewPromptShown: return "review_prompt_shown"
+        case .reviewPromptEligible: return "review_prompt_eligible"
+        case .reviewPromptBlocked: return "review_prompt_blocked"
         case .errorOccurred: return "error_occurred"
         }
     }
@@ -72,6 +78,12 @@ enum AnalyticsEvent {
             return ["error_message": error]
         case .referralClaimed(let code):
             return ["referral_code": code]
+        case .reviewPromptShown(let trigger):
+            return ["trigger": trigger]
+        case .reviewPromptEligible(let trigger, let generationCount):
+            return ["trigger": trigger, "generation_count": generationCount]
+        case .reviewPromptBlocked(let trigger, let reason):
+            return ["trigger": trigger, "reason": reason]
         default:
             return [:]
         }
