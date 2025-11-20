@@ -96,10 +96,20 @@ enum AppConfig {
     // Generation limits and rewards
     static let initialFreeGenerations = 3
     static let referralRewardAmount = 3 // Both referrer and referee get this amount
+    static let videoShareRewardAmount = 10
+    static let subscriptionBonusGenerations = 10
 
     // Referral system
     static let referralBaseUrl = "https://holidayhomeai.up.railway.app/r/"
     static let appStoreUrl = "https://apps.apple.com/us/app/holidayhomeai/id6755014951" // Updated with real App Store URL
+    static let storyShareUrl = "https://holidayhomeai.up.railway.app"
+
+    // RevenueCat configuration
+    static let revenueCatAPIKey = "appl_ufswMSjauCXzGpJpwUkAMCkiIDK"
+    static let revenueCatEntitlementId = "JMM Production Pro"
+    static let revenueCatOfferingIdentifier = "default"
+    static let revenueCatBasicPackProduct = "holiday_basic_pack"
+    static let revenueCatHolidayUnlimitedProduct = "holiday_unlimited_pass"
 }
 
 // MARK: - Animation (2025 Apple Design - Spring Physics)

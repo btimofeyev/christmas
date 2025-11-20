@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import AVFoundation
+import RevenueCat
 
 @MainActor
 class HomeDesignViewModel: ObservableObject {
@@ -48,7 +49,9 @@ class HomeDesignViewModel: ObservableObject {
     @Published var myReferralUrl: String?
     @Published var isGeneratingReferralCode = false
     @Published var referralRewardMessage: String = ""
+    @Published var rewardTitle: String = "Reward Unlocked"
     @Published var showReferralReward = false
+    @Published var hasProSubscription = false
 
     // Manual Referral Code Entry
     @Published var showReferralCodeEntry = false
@@ -63,19 +66,30 @@ class HomeDesignViewModel: ObservableObject {
     private let myReferralCodeKey = "my_referral_code"
     private let myReferralUrlKey = "my_referral_url"
     private let claimedReferralCodesKey = "claimed_referral_codes"
+    private let videoShareRewardKey = "video_share_reward_awarded"
+    private let subscriptionRewardDateKey = "subscription_reward_date"
+
+    private var hasEarnedVideoShareReward: Bool {
+        get { UserDefaults.standard.bool(forKey: videoShareRewardKey) }
+        set { UserDefaults.standard.set(newValue, forKey: videoShareRewardKey) }
+    }
+
+    private var lastSubscriptionRewardTimestamp: TimeInterval {
+        get { UserDefaults.standard.double(forKey: subscriptionRewardDateKey) }
+        set { UserDefaults.standard.set(newValue, forKey: subscriptionRewardDateKey) }
+    }
 
     // Video Export
     @Published var isCreatingVideo = false
     @Published var videoURL: URL?
-    @Published var showVideoShare = false
+    @Published var showVideoPreview = false
 
     // MARK: - Services
 
     private let apiService = APIService.shared
     private let analytics = AnalyticsService.shared
-    // Note: Uncomment these after adding EmailService.swift and VideoExporter.swift to Xcode project
     // private let emailService = EmailService.shared
-    // private let videoExporter = VideoExporter.shared
+    private let videoExporter = VideoExporter.shared
 
     // MARK: - App Steps
 
@@ -218,6 +232,9 @@ class HomeDesignViewModel: ObservableObject {
             isGenerating = false
             generationProgress = 0.0
             showError = false
+            isCreatingVideo = false
+            videoURL = nil
+            showVideoPreview = false
             errorMessage = ""
         }
     }
@@ -512,10 +529,14 @@ class HomeDesignViewModel: ObservableObject {
         analytics.track(event: .videoShared)
     }
 
+    func handleVideoStoryShareTapped() {
+        trackVideoShared()
+        grantVideoShareBonusIfNeeded()
+    }
+
     func createAndShareVideo() {
-        // TODO: Add VideoExporter.swift to Xcode project first, then uncomment
-        showErrorMessage("Video export requires adding VideoExporter.swift to Xcode project")
-        /*
+        guard !isCreatingVideo else { return }
+
         guard let beforeImage = selectedImage,
               let afterImage = decoratedImage else {
             showErrorMessage("Missing images for video creation")
@@ -532,7 +553,7 @@ class HomeDesignViewModel: ObservableObject {
             switch result {
             case .success(let url):
                 self.videoURL = url
-                self.showVideoShare = true
+                self.showVideoPreview = true
 
                 // Track success
                 self.analytics.track(event: .videoCreated)
@@ -550,7 +571,68 @@ class HomeDesignViewModel: ObservableObject {
                 HapticFeedback.error()
             }
         }
-        */
+    }
+
+    func cleanupVideoShare() {
+        if let url = videoURL {
+            try? FileManager.default.removeItem(at: url)
+        }
+        videoURL = nil
+        showVideoPreview = false
+    }
+
+    private func grantVideoShareBonusIfNeeded() {
+        guard !hasEarnedVideoShareReward else { return }
+
+        hasEarnedVideoShareReward = true
+        generationsRemaining += AppConfig.videoShareRewardAmount
+        saveGenerationCount()
+
+        referralRewardMessage = "Thanks for sharing! Enjoy +\(AppConfig.videoShareRewardAmount) extra designs 🎁"
+        rewardTitle = "Video Bonus"
+        showReferralReward = true
+
+        HapticFeedback.success()
+    }
+
+    // MARK: - Purchases & Subscriptions
+
+    func handleSubscriptionUpdate(_ customerInfo: CustomerInfo?) {
+        guard let info = customerInfo else {
+            hasProSubscription = false
+            return
+        }
+
+        let entitlement = info.entitlements[AppConfig.revenueCatEntitlementId]
+        let isActive = entitlement?.isActive == true
+        hasProSubscription = isActive
+
+        guard
+            isActive,
+            let latestPurchaseDate = entitlement?.latestPurchaseDate
+        else {
+            return
+        }
+
+        let timestamp = latestPurchaseDate.timeIntervalSince1970
+        if timestamp > lastSubscriptionRewardTimestamp {
+            lastSubscriptionRewardTimestamp = timestamp
+            applySubscriptionBonus(productId: entitlement?.productIdentifier)
+        }
+    }
+
+    private func applySubscriptionBonus(productId: String?) {
+        generationsRemaining += AppConfig.subscriptionBonusGenerations
+        saveGenerationCount()
+        rewardTitle = "Premium Reward"
+        referralRewardMessage = "Thanks for supporting HomeDesign AI! Enjoy +\(AppConfig.subscriptionBonusGenerations) extra designs 🎁"
+        showReferralReward = true
+
+        if let productId {
+            analytics.track(event: .subscriptionUnlocked(productId: productId))
+        }
+
+        HapticFeedback.success()
     }
 
     // MARK: - Referral System
@@ -616,6 +698,7 @@ class HomeDesignViewModel: ObservableObject {
                 UserDefaults.standard.set(updatedClaimedCodes, forKey: claimedReferralCodesKey)
 
                 // Show success message
+                self.rewardTitle = "Referral Reward"
                 self.referralRewardMessage = "Welcome! You earned \(response.reward.claimer) free designs! 🎁"
                 self.showReferralReward = true
 
@@ -680,6 +763,7 @@ class HomeDesignViewModel: ObservableObject {
                 UserDefaults.standard.set(updatedClaimedCodes, forKey: claimedReferralCodesKey)
 
                 // Show success message
+                self.rewardTitle = "Referral Reward"
                 self.referralRewardMessage = "Success! You earned \(response.reward.claimer) free designs! 🎁"
                 self.showReferralReward = true
 
@@ -742,9 +826,17 @@ class HomeDesignViewModel: ObservableObject {
 
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
+    var completion: ((Bool) -> Void)? = nil
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        controller.completionWithItemsHandler = { _, completed, _, _ in
+            guard let completion = completion else { return }
+            DispatchQueue.main.async {
+                completion(completed)
+            }
+        }
+        return controller
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}

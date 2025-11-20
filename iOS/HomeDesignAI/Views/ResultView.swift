@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVKit
 
 struct ResultView: View {
     @ObservedObject var viewModel: HomeDesignViewModel
@@ -106,6 +107,20 @@ struct ResultView: View {
                     }
                     .accessibilityLabel("Share image")
                     .accessibilityHint("Share your decorated space with others")
+
+                    ResultActionButton(
+                        icon: "play.rectangle.on.rectangle",
+                        label: "Story +10",
+                        background: AppColors.surface,
+                        foreground: AppColors.primary,
+                        isLoading: viewModel.isCreatingVideo,
+                        loadingLabel: "Creating"
+                    ) {
+                        viewModel.createAndShareVideo()
+                    }
+                    .accessibilityLabel("Share before and after video")
+                    .accessibilityHint("Create an Instagram-ready video and earn +10 more designs")
+                    .disabled(viewModel.isCreatingVideo || viewModel.decoratedImage == nil)
 
                     ResultActionButton(
                         icon: "arrow.counterclockwise",
@@ -232,6 +247,21 @@ struct ResultView: View {
                 ShareSheet(items: [image])
             }
         }
+        .sheet(isPresented: $viewModel.showVideoPreview, onDismiss: {
+            viewModel.cleanupVideoShare()
+        }) {
+            if let videoURL = viewModel.videoURL {
+                VideoPreviewSheet(
+                    videoURL: videoURL,
+                    shareAction: {
+                        viewModel.handleVideoStoryShareTapped()
+                    },
+                    closeAction: {
+                        viewModel.cleanupVideoShare()
+                    }
+                )
+            }
+        }
         .fullScreenCover(isPresented: $showFullScreen) {
             if let decoratedImage = viewModel.decoratedImage,
                let originalImage = viewModel.selectedImage {
@@ -320,16 +350,27 @@ private struct ResultActionButton: View {
     let label: String
     let background: Color
     let foreground: Color
+    var isLoading: Bool = false
+    var loadingLabel: String?
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             VStack(spacing: AppSpacing.xs) {
-                Image(systemName: icon)
-                    .font(.system(size: 20, weight: .semibold))
-                Text(label)
-                    .font(AppFonts.caption)
-                    .fontWeight(.semibold)
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .tint(foreground)
+                    Text(loadingLabel ?? label)
+                        .font(AppFonts.caption)
+                        .fontWeight(.semibold)
+                } else {
+                    Image(systemName: icon)
+                        .font(.system(size: 20, weight: .semibold))
+                    Text(label)
+                        .font(AppFonts.caption)
+                        .fontWeight(.semibold)
+                }
             }
             .foregroundColor(foreground)
             .frame(maxWidth: .infinity)
@@ -349,6 +390,7 @@ private struct ResultActionButton: View {
         }
         .buttonStyle(.plain)
         .pressAnimation()
+        .disabled(isLoading)
     }
 }
 
@@ -435,6 +477,116 @@ private struct FullScreenImageView: View {
         }
         .onTapGesture {
             isPresented = false
+        }
+    }
+}
+
+private struct VideoPreviewSheet: View {
+    let videoURL: URL
+    let shareAction: () -> Void
+    let closeAction: () -> Void
+
+    @State private var player: AVPlayer
+    @State private var isShowingShare = false
+
+    init(videoURL: URL, shareAction: @escaping () -> Void, closeAction: @escaping () -> Void) {
+        self.videoURL = videoURL
+        self.shareAction = shareAction
+        self.closeAction = closeAction
+        _player = State(initialValue: AVPlayer(url: videoURL))
+    }
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: AppSpacing.lg) {
+                VideoPlayer(player: player)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 420)
+                    .cornerRadius(AppCornerRadius.lg)
+                    .shadow(color: AppColors.deepShadow.opacity(0.25), radius: 20, x: 0, y: 12)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: AppCornerRadius.lg)
+                            .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                    )
+                    .onAppear {
+                        player.play()
+                    }
+                    .onDisappear {
+                        player.pause()
+                    }
+
+                Text("Preview your share-ready Story clip before posting it to Instagram, TikTok, or Messages. Sharing unlocks +\(AppConfig.videoShareRewardAmount) bonus designs instantly.")
+                    .font(AppFonts.callout)
+                    .foregroundColor(AppColors.text)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+
+                VStack(spacing: AppSpacing.md) {
+                    Button {
+                        player.pause()
+                        isShowingShare = true
+                    } label: {
+                        HStack(spacing: AppSpacing.sm) {
+                            Image(systemName: "square.and.arrow.up.on.square.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                            Text("Share Story")
+                                .font(AppFonts.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(AppColors.accent)
+                        .cornerRadius(AppCornerRadius.md)
+                        .shadow(color: AppColors.deepShadow.opacity(0.2), radius: 10, x: 0, y: 6)
+                    }
+
+                    Button {
+                        player.pause()
+                        closeAction()
+                    } label: {
+                        Text("Done")
+                            .font(AppFonts.body)
+                            .fontWeight(.semibold)
+                            .foregroundColor(AppColors.primary)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(AppColors.surface)
+                            .cornerRadius(AppCornerRadius.md)
+                    }
+                }
+                .padding(.horizontal)
+
+                Spacer()
+            }
+            .padding()
+            .background(AppColors.background.ignoresSafeArea())
+            .navigationTitle("Story Preview")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Close") {
+                        player.pause()
+                        closeAction()
+                    }
+                    .font(AppFonts.body)
+                }
+            }
+        }
+        .sheet(isPresented: $isShowingShare, onDismiss: {
+            player.play()
+        }) {
+            ShareSheet(
+                items: [
+                    videoURL,
+                    "Before ➡️ After with HomeDesign AI 🎄 Instantly redecorate your space: \(AppConfig.storyShareUrl)"
+                ],
+                completion: { completed in
+                    if completed {
+                        shareAction()
+                    }
+                }
+            )
         }
     }
 }

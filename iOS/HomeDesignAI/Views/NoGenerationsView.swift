@@ -11,6 +11,8 @@ struct NoGenerationsView: View {
     @ObservedObject var viewModel: HomeDesignViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var showShareSheet = false
+    @State private var showStore = false
+    @EnvironmentObject private var purchasesManager: PurchasesManager
 
     var body: some View {
         NavigationView {
@@ -90,6 +92,34 @@ struct NoGenerationsView: View {
 
                 // Action Buttons
                 VStack(spacing: 12) {
+                    Button {
+                        showStore = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "sparkles.square.fill")
+                                .font(.headline)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Buy +\(AppConfig.subscriptionBonusGenerations) Designs")
+                                    .font(.headline)
+                                Text("Unlock instantly for $2.99")
+                                    .font(.footnote)
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                            Spacer()
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                colors: [.orange, .red.opacity(0.9)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                    }
+
                     // Share button
                     Button {
                         // Generate referral code if needed
@@ -149,9 +179,14 @@ struct NoGenerationsView: View {
         .sheet(isPresented: $showShareSheet) {
             viewModel.shareReferralLink()
         }
+        .sheet(isPresented: $showStore) {
+            SubscriptionStoreView(viewModel: viewModel)
+                .environmentObject(purchasesManager)
+        }
     }
 }
 
 #Preview {
     NoGenerationsView(viewModel: HomeDesignViewModel())
+        .environmentObject(PurchasesManager())
 }

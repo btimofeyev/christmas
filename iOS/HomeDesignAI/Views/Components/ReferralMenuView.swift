@@ -12,6 +12,7 @@ struct ReferralMenuView: View {
     @Environment(\.dismiss) private var dismiss
     let onEnterCode: () -> Void
     let onShareCode: () -> Void
+    let onPurchaseTapped: () -> Void
 
     var body: some View {
         ZStack {
@@ -34,6 +35,39 @@ struct ReferralMenuView: View {
 
                 // Options
                 VStack(spacing: AppSpacing.md) {
+                    Button(action: {
+                        onPurchaseTapped()
+                    }) {
+                        VStack(alignment: .leading, spacing: AppSpacing.xs) {
+                            HStack {
+                                Image(systemName: "sparkles.square.fill")
+                                    .font(.system(size: 20))
+                                    .foregroundColor(AppColors.primary)
+
+                                Text("Buy +\(AppConfig.subscriptionBonusGenerations) Designs")
+                                    .font(AppFonts.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(AppColors.primary)
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(AppColors.primary.opacity(0.6))
+                            }
+
+                            Text("Only $2.99 — unlock instantly")
+                                .font(AppFonts.caption)
+                                .foregroundColor(Color(red: 0.2, green: 0.8, blue: 0.4))
+                                .padding(.leading, 28)
+                        }
+                        .padding(AppSpacing.md)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(AppColors.surface)
+                        .cornerRadius(AppCornerRadius.md)
+                        .shadow(color: AppColors.deepShadow.opacity(0.2), radius: 8, x: 0, y: 4)
+                    }
+
                     // Enter Code Option
                     Button(action: {
                         onEnterCode()
@@ -130,6 +164,7 @@ struct ReferralMenuView: View {
     ReferralMenuView(
         viewModel: HomeDesignViewModel(),
         onEnterCode: {},
-        onShareCode: {}
+        onShareCode: {},
+        onPurchaseTapped: {}
     )
 }

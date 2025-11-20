@@ -7,12 +7,15 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ContentView: View {
     @StateObject private var viewModel = HomeDesignViewModel()
     @Namespace private var heroNamespace
     @State private var showReferralMenu = false
     @State private var showMyReferralCode = false
+    @State private var showStore = false
+    @EnvironmentObject private var purchasesManager: PurchasesManager
 
     var body: some View {
         ZStack {
@@ -67,7 +70,7 @@ struct ContentView: View {
         } message: {
             Text(viewModel.errorMessage)
         }
-        .alert("Referral Reward!", isPresented: $viewModel.showReferralReward) {
+        .alert(viewModel.rewardTitle, isPresented: $viewModel.showReferralReward) {
             Button("Awesome!", role: .cancel) {}
         } message: {
             Text(viewModel.referralRewardMessage)
@@ -107,6 +110,10 @@ struct ContentView: View {
                     showReferralMenu = false
                     viewModel.generateOrGetReferralCode()
                     showMyReferralCode = true
+                },
+                onPurchaseTapped: {
+                    showReferralMenu = false
+                    showStore = true
                 }
             )
             .presentationDetents([.height(400)])
@@ -114,8 +121,19 @@ struct ContentView: View {
         .sheet(isPresented: $showMyReferralCode) {
             ReferralBottomSheet(viewModel: viewModel)
         }
+        .sheet(isPresented: $showStore) {
+            SubscriptionStoreView(viewModel: viewModel)
+                .environmentObject(purchasesManager)
+        }
         .onOpenURL { url in
             handleDeepLink(url: url)
+        }
+        .onReceive(purchasesManager.$customerInfo) { info in
+            viewModel.handleSubscriptionUpdate(info)
+        }
+        .task {
+            await purchasesManager.fetchOfferings()
+            viewModel.handleSubscriptionUpdate(purchasesManager.customerInfo)
         }
     }
 
@@ -147,4 +165,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(PurchasesManager())
 }

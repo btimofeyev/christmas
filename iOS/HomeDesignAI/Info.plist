@@ -17,9 +17,22 @@
 	<key>CFBundlePackageType</key>
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.5</string>
+	<string>1.6</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.homedesignai.holiday</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>holidayhomeai</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>1.5</string>
+	<string>1.6.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -35,10 +48,10 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>HomeDesign AI needs access to your camera to capture photos of your space for decoration.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>HomeDesign AI needs access to your photo library to select photos of your space for decoration.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>HomeDesign AI needs permission to save your decorated images to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>HomeDesign AI needs access to your photo library to select photos of your space for decoration.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -60,19 +73,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>com.homedesignai.holiday</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>holidayhomeai</string>
-			</array>
-		</dict>
 	</array>
 </dict>
 </plist>

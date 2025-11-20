@@ -32,6 +32,7 @@ enum AnalyticsEvent {
     case reviewPromptEligible(trigger: String, generationCount: Int)
     case reviewPromptBlocked(trigger: String, reason: String)
     case errorOccurred(error: String)
+    case subscriptionUnlocked(productId: String)
 
     var name: String {
         switch self {
@@ -56,6 +57,7 @@ enum AnalyticsEvent {
         case .reviewPromptEligible: return "review_prompt_eligible"
         case .reviewPromptBlocked: return "review_prompt_blocked"
         case .errorOccurred: return "error_occurred"
+        case .subscriptionUnlocked: return "subscription_unlocked"
         }
     }
 
@@ -84,6 +86,8 @@ enum AnalyticsEvent {
             return ["trigger": trigger, "generation_count": generationCount]
         case .reviewPromptBlocked(let trigger, let reason):
             return ["trigger": trigger, "reason": reason]
+        case .subscriptionUnlocked(let productId):
+            return ["product_id": productId]
         default:
             return [:]
         }
