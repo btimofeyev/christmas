@@ -68,6 +68,7 @@ class HomeDesignViewModel: ObservableObject {
     private let claimedReferralCodesKey = "claimed_referral_codes"
     private let videoShareRewardKey = "video_share_reward_awarded"
     private let subscriptionRewardDateKey = "subscription_reward_date"
+    private let processedBasicPackTransactionsKey = "processed_basic_pack_transactions"
 
     private var hasEarnedVideoShareReward: Bool {
         get { UserDefaults.standard.bool(forKey: videoShareRewardKey) }
@@ -77,6 +78,11 @@ class HomeDesignViewModel: ObservableObject {
     private var lastSubscriptionRewardTimestamp: TimeInterval {
         get { UserDefaults.standard.double(forKey: subscriptionRewardDateKey) }
         set { UserDefaults.standard.set(newValue, forKey: subscriptionRewardDateKey) }
+    }
+
+    private var processedBasicPackTransactions: Set<String> {
+        get { Set(UserDefaults.standard.stringArray(forKey: processedBasicPackTransactionsKey) ?? []) }
+        set { UserDefaults.standard.set(Array(newValue), forKey: processedBasicPackTransactionsKey) }
     }
 
     // Video Export
@@ -607,18 +613,18 @@ class HomeDesignViewModel: ObservableObject {
         let isActive = entitlement?.isActive == true
         hasProSubscription = isActive
 
-        guard
+        if
             isActive,
             let latestPurchaseDate = entitlement?.latestPurchaseDate
-        else {
-            return
+        {
+            let timestamp = latestPurchaseDate.timeIntervalSince1970
+            if timestamp > lastSubscriptionRewardTimestamp {
+                lastSubscriptionRewardTimestamp = timestamp
+                applySubscriptionBonus(productId: entitlement?.productIdentifier)
+            }
         }
 
-        let timestamp = latestPurchaseDate.timeIntervalSince1970
-        if timestamp > lastSubscriptionRewardTimestamp {
-            lastSubscriptionRewardTimestamp = timestamp
-            applySubscriptionBonus(productId: entitlement?.productIdentifier)
-        }
+        handleBasicPackPurchases(info)
     }
 
     private func applySubscriptionBonus(productId: String?) {
@@ -632,6 +638,34 @@ class HomeDesignViewModel: ObservableObject {
             analytics.track(event: .subscriptionUnlocked(productId: productId))
         }
 
+        HapticFeedback.success()
+    }
+
+    private func handleBasicPackPurchases(_ info: CustomerInfo) {
+        let transactions = info.nonSubscriptions.filter {
+            $0.productIdentifier == AppConfig.revenueCatBasicPackProduct
+        }
+        guard !transactions.isEmpty else { return }
+
+        var processed = processedBasicPackTransactions
+        let newTransactionIds = transactions.compactMap { transaction -> String? in
+            let identifier = transaction.transactionIdentifier
+            return processed.contains(identifier) ? nil : identifier
+        }
+
+        guard !newTransactionIds.isEmpty else { return }
+
+        newTransactionIds.forEach { processed.insert($0) }
+        processedBasicPackTransactions = processed
+
+        let generationsEarned = AppConfig.subscriptionBonusGenerations * newTransactionIds.count
+        generationsRemaining += generationsEarned
+        saveGenerationCount()
+
+        rewardTitle = "Holiday Pack Added"
+        referralRewardMessage = "Enjoy +\(generationsEarned) extra designs 🎁"
+        showReferralReward = true
+        analytics.track(event: .subscriptionUnlocked(productId: AppConfig.revenueCatBasicPackProduct))
         HapticFeedback.success()
     }
 

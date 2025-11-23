@@ -269,7 +269,12 @@ export async function generateDecoratedImage(
       throw new Error('No candidates returned from the API.');
     }
 
-    const imagePart = firstCandidate.content.parts.find(
+    const contentParts = firstCandidate.content?.parts;
+    if (!contentParts || contentParts.length === 0) {
+      throw new Error('Candidate content missing from API response.');
+    }
+
+    const imagePart = contentParts.find(
       (part) => part.inlineData
     );
 
