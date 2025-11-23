@@ -14,7 +14,11 @@ struct HomeDesignAIApp: App {
 
     init() {
         Purchases.logLevel = .debug
-        Purchases.configure(withAPIKey: AppConfig.revenueCatAPIKey)
+        let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? UUID().uuidString
+        let configuration = Configuration.Builder(withAPIKey: AppConfig.revenueCatAPIKey)
+            .with(appUserID: deviceId)
+            .build()
+        Purchases.configure(with: configuration)
         _purchasesManager = StateObject(wrappedValue: PurchasesManager())
     }
 
