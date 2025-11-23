@@ -32,6 +32,24 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
+const ensurePurchaseTransactionsTable = async () => {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS purchase_transactions (
+        transaction_id VARCHAR(255) PRIMARY KEY,
+        device_id VARCHAR(255) NOT NULL,
+        product_id VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✅ Ensured purchase_transactions table exists');
+  } catch (error) {
+    console.error('❌ Failed to ensure purchase_transactions table exists', error);
+  }
+};
+
+ensurePurchaseTransactionsTable();
+
 /**
  * Execute a SQL query
  * @param {string} text - SQL query
@@ -101,6 +119,39 @@ export const getUserByDeviceId = async (deviceId) => {
   return result.rows[0] || null;
 };
 
+export const getUnprocessedTransactions = async (transactionIds) => {
+  if (!transactionIds || transactionIds.length === 0) {
+    return [];
+  }
+
+  const result = await query(
+    'SELECT transaction_id FROM purchase_transactions WHERE transaction_id = ANY($1::text[])',
+    [transactionIds]
+  );
+
+  const processed = new Set(result.rows.map((row) => row.transaction_id));
+  return transactionIds.filter((id) => !processed.has(id));
+};
+
+export const recordProcessedTransactions = async (deviceId, productId, transactionIds) => {
+  if (!transactionIds || transactionIds.length === 0) {
+    return;
+  }
+
+  const values = transactionIds
+    .map((_, index) => `($${index * 3 + 1}, $${index * 3 + 2}, $${index * 3 + 3})`)
+    .join(', ');
+
+  const params = transactionIds.flatMap((id) => [id, deviceId, productId]);
+
+  await query(
+    `INSERT INTO purchase_transactions (transaction_id, device_id, product_id)
+     VALUES ${values}
+     ON CONFLICT (transaction_id) DO NOTHING`,
+    params
+  );
+};
+
 // Named exports for direct use
 export { pool };
 
@@ -110,5 +161,7 @@ export default {
   getOrCreateUser,
   updateUserGenerations,
   getUserByDeviceId,
+  getUnprocessedTransactions,
+  recordProcessedTransactions,
   pool
 };

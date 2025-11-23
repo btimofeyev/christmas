@@ -36,3 +36,10 @@ struct UserDataResponse: Codable {
     let totalGenerated: Int
     let deviceId: String
 }
+
+struct CreditGenerationsResponse: Codable {
+    let generationsRemaining: Int
+    let totalGenerated: Int
+    let creditedTransactions: Int
+    let creditedAmount: Int
+}

@@ -667,6 +667,36 @@ class HomeDesignViewModel: ObservableObject {
         showReferralReward = true
         analytics.track(event: .subscriptionUnlocked(productId: AppConfig.revenueCatBasicPackProduct))
         HapticFeedback.success()
+
+        syncGenerationsWithBackend(
+            productId: AppConfig.revenueCatBasicPackProduct,
+            transactionIds: newTransactionIds
+        )
+    }
+
+    private func syncGenerationsWithBackend(productId: String, transactionIds: [String]) {
+        guard !transactionIds.isEmpty else { return }
+
+        Task {
+            do {
+                let response = try await apiService.creditGenerations(
+                    deviceId: deviceId,
+                    productId: productId,
+                    transactionIds: transactionIds
+                )
+
+                await MainActor.run {
+                    self.generationsRemaining = response.generationsRemaining
+                    self.totalDesignsGenerated = response.totalGenerated
+                    self.saveGenerationCount()
+                    UserDefaults.standard.set(response.totalGenerated, forKey: self.totalGeneratedKey)
+                }
+            } catch {
+                #if DEBUG
+                print("⚠️ Failed to sync generations with backend: \(error.localizedDescription)")
+                #endif
+            }
+        }
     }
 
     // MARK: - Referral System

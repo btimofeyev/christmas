@@ -11,6 +11,7 @@ import generateRouter from './routes/generate.js';
 import subscribeRouter from './routes/subscribe.js';
 import referralRouter from './routes/referral.js';
 import contactRouter from './routes/contact.js';
+import generationsRouter from './routes/generations.js';
 import { pool } from './db/database.js';
 
 const app = express();
@@ -88,6 +89,7 @@ app.use('/generate', generateRouter);
 app.use('/subscribe', subscribeRouter);
 app.use('/referral', referralRouter);
 app.use('/contact', contactRouter);
+app.use('/generations', generationsRouter);
 
 // Referral landing page route
 app.get('/r/:code', (req, res) => {

@@ -307,9 +307,67 @@ class APIService {
             throw APIError.networkError(error)
         }
     }
+
+    /// Credits generations on the backend (e.g., from consumable purchases)
+    func creditGenerations(
+        deviceId: String,
+        productId: String,
+        transactionIds: [String]
+    ) async throws -> CreditGenerationsResponse {
+        guard let url = URL(string: "\(baseURL)/generations/credit") else {
+            throw APIError.invalidURL
+        }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.timeoutInterval = 30
+
+        let payload = CreditGenerationsRequest(
+            deviceId: deviceId,
+            productId: productId,
+            transactionIds: transactionIds
+        )
+
+        do {
+            let encoder = JSONEncoder()
+            urlRequest.httpBody = try encoder.encode(payload)
+        } catch {
+            throw APIError.decodingError(error)
+        }
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw APIError.invalidResponse
+            }
+
+            if httpResponse.statusCode != 200 {
+                if let errorResponse = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
+                    throw APIError.serverError(errorResponse.error)
+                }
+                throw APIError.serverError("HTTP \(httpResponse.statusCode)")
+            }
+
+            let decoder = JSONDecoder()
+            return try decoder.decode(CreditGenerationsResponse.self, from: data)
+
+        } catch let error as APIError {
+            throw error
+        } catch {
+            throw APIError.networkError(error)
+        }
+    }
 }
 
 // MARK: - Helper Models
+
+private struct CreditGenerationsRequest: Codable {
+    let deviceId: String
+    let productId: String
+    let transactionIds: [String]
+}
 
 private struct ErrorResponse: Codable {
     let error: String
