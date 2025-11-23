@@ -5,6 +5,10 @@ import RevenueCat
 final class PurchasesManager: NSObject, ObservableObject {
     @Published private(set) var customerInfo: CustomerInfo?
     @Published private(set) var offerings: Offerings?
+    var activeOffering: Offering? {
+        guard let offerings else { return nil }
+        return offerings.offering(identifier: AppConfig.revenueCatOfferingIdentifier) ?? offerings.current
+    }
     @Published var isProUnlocked: Bool = false
     @Published var isLoading: Bool = false
     @Published var isPurchasing: Bool = false

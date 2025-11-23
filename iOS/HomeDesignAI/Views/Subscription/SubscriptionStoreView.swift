@@ -19,7 +19,7 @@ struct SubscriptionStoreView: View {
     }
 
     private var holidayPackages: [Package] {
-        guard let packages = purchasesManager.offerings?.current?.availablePackages else { return [] }
+        guard let packages = purchasesManager.activeOffering?.availablePackages else { return [] }
         let allowed = Set(featuredProductOrder)
         let filtered = packages.filter { allowed.contains($0.storeProduct.productIdentifier) }
         return filtered.sorted { lhs, rhs in
@@ -122,7 +122,7 @@ struct SubscriptionStoreView: View {
     @ViewBuilder
     private var paywallSection: some View {
         #if canImport(RevenueCatUI)
-        if #available(iOS 15.0, *), let offering = purchasesManager.offerings?.current, offering.hasPaywall {
+        if #available(iOS 15.0, *), let offering = purchasesManager.activeOffering, offering.hasPaywall {
             PaywallView(offering: offering, displayCloseButton: false)
                 .frame(minHeight: 460)
                 .background(AppColors.surface)

@@ -107,7 +107,7 @@ enum AppConfig {
     // RevenueCat configuration
     static let revenueCatAPIKey = "appl_ufswMSjauCXzGpJpwUkAMCkiIDK"
     static let revenueCatEntitlementId = "JMM Production Pro"
-    static let revenueCatOfferingIdentifier = "default"
+    static let revenueCatOfferingIdentifier = "holiday_basic_pack"
     static let revenueCatBasicPackProduct = "holiday_basic_pack"
     static let revenueCatHolidayUnlimitedProduct = "holiday_unlimited_pass"
 }
